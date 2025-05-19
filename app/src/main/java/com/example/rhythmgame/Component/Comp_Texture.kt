@@ -30,4 +30,12 @@ class Comp_Texture(context: Context, resId: Int) : Component() {
         // 바인딩 해제
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0)
     }
+
+    public fun Bind_Texture() {
+
+    }
+
+    override fun Clone(): Comp_Texture {
+        return this
+    }
 }

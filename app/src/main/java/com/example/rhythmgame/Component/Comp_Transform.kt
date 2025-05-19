@@ -1,6 +1,7 @@
 package com.example.rhythmgame.Component
 
 import android.opengl.Matrix
+import android.util.Log
 
 class Comp_Transform : Component() {
     var position = floatArrayOf(0f, 0f, 0f)
@@ -21,5 +22,14 @@ class Comp_Transform : Component() {
 
         //이동
         Matrix.translateM(SRP, 0, position[0], position[1], position[2])
+    }
+
+    override fun Clone(): Comp_Transform {
+        val newComponent = Comp_Transform()
+        newComponent.position = this.position.copyOf()
+        newComponent.rotation = this.rotation.copyOf()
+        newComponent.scale = this.scale.copyOf()
+        System.arraycopy(this.SRP, 0, newComponent.SRP, 0, this.SRP.size)
+        return newComponent
     }
 }

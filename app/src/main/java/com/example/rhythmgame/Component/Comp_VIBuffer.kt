@@ -37,4 +37,8 @@ class Comp_VIBuffer : Component() {
                 position(0)
             }
     }
+
+    override fun Clone(): Comp_VIBuffer {
+        return this
+    }
 }

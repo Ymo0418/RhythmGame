@@ -13,10 +13,11 @@ object ComponentManager : Base() {
         Components[tag] = comp
         return true
     }
+
     fun Clone_Component(tag: String) : Component? {
         if(!Components.containsKey(tag))
             return null
 
-        return Components[tag]
+        return Components[tag]?.Clone()
     }
 }
