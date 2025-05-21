@@ -2,9 +2,10 @@
     <string name="VS_VtxPosTex">
             attribute vec4 a_Position;
             attribute vec2 a_TexCoord;
+            uniform mat4 u_worldMatrix;
             varying vec2 v_TexCoord;
             void main() {
-              gl_Position = a_Position;
+              gl_Position = u_worldMatrix * a_Position;
               v_TexCoord = a_TexCoord;
             }
     </string>

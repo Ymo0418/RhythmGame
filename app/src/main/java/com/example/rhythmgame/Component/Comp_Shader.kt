@@ -26,10 +26,6 @@ class Comp_Shader(vs: String, ps: String) : Component() {
         Check_LinkedProgram()
     }
 
-    public fun Get_AttributeLocation(name: String): Int {
-        return GLES20.glGetAttribLocation(programHandle, name)
-    }
-
     private fun Check_CompiledShader(shader: Int) {
         val compiled = IntArray(1)
         GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0)
@@ -50,5 +46,19 @@ class Comp_Shader(vs: String, ps: String) : Component() {
             GLES20.glDeleteProgram(programHandle)
             throw RuntimeException("Program linking failed")
         }
+    }
+
+    public fun Use_Program() {
+        GLES20.glUseProgram(programHandle)
+    }
+    public fun Get_Attribute(name: String) : Int {
+        return GLES20.glGetAttribLocation(programHandle, name)
+    }
+    public fun Get_UniformAttribute(name: String) : Int {
+        return GLES20.glGetUniformLocation(programHandle, name)
+    }
+
+    override fun Clone(): Comp_Shader {
+        return this
     }
 }
