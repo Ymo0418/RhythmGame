@@ -3,7 +3,9 @@ package com.example.rhythmgame.Component
 import android.opengl.GLES20
 import android.util.Log
 
-class Comp_Shader(vs: String, ps: String) : Component() {
+class Comp_Shader(vs: String, fs: String) : Component() {
+    private val VtxShaderStr = vs
+    private val FrgShaderStr = fs
     private var VtxShader : Int
     private var FrgShader : Int
     var programHandle = 0
@@ -15,7 +17,7 @@ class Comp_Shader(vs: String, ps: String) : Component() {
         Check_CompiledShader(VtxShader)
 
         FrgShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER)
-        GLES20.glShaderSource(FrgShader, ps)
+        GLES20.glShaderSource(FrgShader, fs)
         GLES20.glCompileShader(FrgShader)
         Check_CompiledShader(FrgShader)
 
@@ -59,6 +61,6 @@ class Comp_Shader(vs: String, ps: String) : Component() {
     }
 
     override fun Clone(): Comp_Shader {
-        return this
+        return Comp_Shader(VtxShaderStr, FrgShaderStr)
     }
 }

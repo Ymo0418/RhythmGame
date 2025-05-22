@@ -17,12 +17,11 @@ import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.ComponentManager
+import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Object.RenderObject
 import java.nio.*
 
 class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
-    private lateinit var Player: Object
-    private lateinit var Player2: Object
 
     override fun onSurfaceCreated(unused: javax.microedition.khronos.opengles.GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
         //GLES20.glClearColor(0f, 0f, 0f, 1f)
@@ -33,9 +32,11 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("ShaderCom", Comp_Shader(context.getString(R.string.VS_VtxPosTex)
                                                                         , context.getString(R.string.FS_VtxPosTex)))
 
-        Player = RenderObject()
-        Player2 = RenderObject()
-        Player2.TransformCom.position[1] = 0.5f
+        val Monster = RenderObject()
+        Monster.TransformCom.position[1] = 0.5f
+
+        ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, RenderObject())
+        ObjectManager.Add_Object(ObjectManager.LayerType.MONSTER, Monster)
     }
 
     //GLSurfaceView의 크기가 변경되거나 화면 방향이 전환될 때 호출
@@ -47,11 +48,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onDrawFrame(unused: javax.microedition.khronos.opengles.GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 
-        Player.Update(0.016f)
-        Player2.Update(0.016f)
-        Player.LateUpdate(0.016f)
-        Player2.LateUpdate(0.016f)
-        Player.Render()
-        Player2.Render()
+        ObjectManager.Update(0.016f)
+        ObjectManager.LateUpdate(0.016f)
+        ObjectManager.Render()
     }
 }

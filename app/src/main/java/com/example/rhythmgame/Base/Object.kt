@@ -7,7 +7,6 @@ import com.example.rhythmgame.Manager.ComponentManager
 
 open class Object : Base() {
     val Components: MutableList<Component> = mutableListOf()
-    var CombinedMatrix = FloatArray(16)
     lateinit var TransformCom: Comp_Transform
 
     init {
