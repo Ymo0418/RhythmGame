@@ -1,25 +1,16 @@
 package com.example.rhythmgame
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.opengl.GLES20.*
 import android.opengl.GLSurfaceView
-import android.opengl.GLUtils
-import com.example.rhythmgame.R
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
 import android.opengl.GLES20
-import android.util.Log
-import com.example.rhythmgame.Base.Object
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.ComponentManager
 import com.example.rhythmgame.Manager.ObjectManager
-import com.example.rhythmgame.Object.RenderObject
-import java.nio.*
+import com.example.rhythmgame.Object.TestMario
 
 class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
@@ -31,12 +22,13 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("VIBufferCom", Comp_VIBuffer())
         ComponentManager.Register_Component("ShaderCom", Comp_Shader(context.getString(R.string.VS_VtxPosTex)
                                                                         , context.getString(R.string.FS_VtxPosTex)))
+        //val joystick = Joystick()
+        //ObjectManager.Add_Object(ObjectManager.LayerType.UI, joystick)
 
-        val Monster = RenderObject()
-        Monster.TransformCom.position[1] = 0.5f
-
-        ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, RenderObject())
-        ObjectManager.Add_Object(ObjectManager.LayerType.MONSTER, Monster)
+        val Mario = TestMario()
+        Mario.TransformCom.position[1] = 0.5f
+        //[0]이 x좌표 [1]이 Y좌표
+        ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Mario)
     }
 
     //GLSurfaceView의 크기가 변경되거나 화면 방향이 전환될 때 호출
@@ -51,5 +43,12 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ObjectManager.Update(0.016f)
         ObjectManager.LateUpdate(0.016f)
         ObjectManager.Render()
+    }
+
+    fun SetJoystickPosition(x:Float, y:Float){
+        val UILayer = ObjectManager.Get_Objects(ObjectManager.LayerType.PLAYER) // UI로 수정 해야 조이스틱 사용가능
+        UILayer.first().TransformCom.position[0] = x
+        UILayer.first().TransformCom.position[1] = y
+
     }
 }

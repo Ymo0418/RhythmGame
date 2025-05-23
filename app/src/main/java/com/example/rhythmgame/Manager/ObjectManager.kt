@@ -7,17 +7,16 @@ import com.example.rhythmgame.Base.Object
 
 object ObjectManager : Base() {
     public enum class LayerType {
-        CAMERA, PLAYER, MONSTER, BACKGROUND
+        CAMERA, PLAYER, MONSTER, BACKGROUND, UI
     }
     private val LayerOrder = listOf(
-        LayerType.CAMERA, LayerType.PLAYER, LayerType.MONSTER, LayerType.BACKGROUND
+        LayerType.CAMERA, LayerType.PLAYER, LayerType.MONSTER, LayerType.BACKGROUND, LayerType.UI
     )
 
     private val Layers = mutableMapOf<LayerType, MutableList<Object>>()
 
     init {
         for(layer in LayerType.entries) {
-            Log.e("dd", "$layer")
             Layers[layer] = mutableListOf()
         }
     }
@@ -50,5 +49,9 @@ object ObjectManager : Base() {
 
     public fun Add_Object(layer: LayerType, target: Object) {
         Layers[layer]?.add(target)
+    }
+
+    public fun Get_Objects(layer:LayerType):MutableList<Object>{
+        return Layers.getValue(layer)
     }
 }
