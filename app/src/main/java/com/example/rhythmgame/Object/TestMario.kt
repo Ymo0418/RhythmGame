@@ -6,7 +6,7 @@ import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
 
-class RenderObject : Object() {
+class TestMario : Object() {
     lateinit var TextureCom: Comp_Texture
     lateinit var BufferCom: Comp_VIBuffer
     lateinit var ShaderCom: Comp_Shader
