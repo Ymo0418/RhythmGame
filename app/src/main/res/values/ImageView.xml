@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 원본 조이스틱 이미지 해상도 (pixel 단위) -->
+    <integer name="joystick_image_original_width_px">200</integer>
+    <integer name="joystick_image_original_height_px">200</integer>
+
+    <!-- 화면에 표시할 조이스틱 크기 (dp 단위) -->
+    <dimen name="joystick_image_display_size">80dp</dimen>
+
+    <!-- ConstraintLayout ratio 지정용 (가로:세로 = 1:1) -->
+    <string name="joystick_image_aspect_ratio">1:1</string>
+</resources>
