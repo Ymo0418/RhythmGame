@@ -26,7 +26,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     var moveSpeed = 0f
 
     // [3] 속도 최대값 (NDC 단위/sec)
-    val maxSpeed = 3.0f
+    val maxSpeed = 4.0f
 
     override fun onSurfaceCreated(unused: javax.microedition.khronos.opengles.GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
         GLES20.glClearColor(0f, 0f, 0f, 1f)
