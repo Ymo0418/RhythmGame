@@ -18,6 +18,16 @@ import java.nio.file.Files.move
 
 class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
+    // [1] 매 프레임 Mario 이동용 방향 벡터
+    var moveDirX = 0f
+    var moveDirY = 0f
+
+    // [2] Mario 속도 스칼라 (드래그 벡터 크기 비례)
+    var moveSpeed = 0f
+
+    // [3] 속도 최대값 (NDC 단위/sec)
+    val maxSpeed = 3.0f
+
     override fun onSurfaceCreated(unused: javax.microedition.khronos.opengles.GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
         GLES20.glClearColor(0f, 0f, 0f, 1f)
 
@@ -52,6 +62,17 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onDrawFrame(unused: javax.microedition.khronos.opengles.GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 
+        // [6] 매 프레임 Mario 이동:
+        //      방향(moveDirX, moveDirY) × 속도(moveSpeed) × Δ시간
+        val deltaTime = 0.016f  // 약 60 FPS 가정
+        val marioObj = ObjectManager
+            .Get_Objects(ObjectManager.LayerType.PLAYER)
+            .filterIsInstance<TestMario>()
+            .firstOrNull()
+        marioObj?.let {
+            it.TransformCom.position[0] += moveDirX * moveSpeed * deltaTime
+            it.TransformCom.position[1] += moveDirY * moveSpeed * deltaTime
+        }
         ObjectManager.Update(0.016f)
         ObjectManager.LateUpdate(0.016f)
         ObjectManager.Render()
