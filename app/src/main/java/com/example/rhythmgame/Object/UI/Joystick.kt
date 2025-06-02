@@ -39,7 +39,6 @@ class Joystick : Object() {
     fun move(x: Float, y: Float) {
         KnobTrans.position[0] = x
         KnobTrans.position[1] = y
-        Log.e("Dddd", "{$x $y}")
     }
 
     /** 터치가 끝났을 때 호출되어 조이스틱을 숨김 */
