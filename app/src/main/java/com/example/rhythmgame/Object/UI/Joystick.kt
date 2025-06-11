@@ -29,12 +29,8 @@ class Joystick : UIObject() {
     }
 
     override fun Update(fTimeDelta: Float) {
-
-        TransformCom.position[0] = 10f
-        TransformCom.position[1] = 10f
-
         val dx = curX - baseX
-        val dy = baseY - curY
+        val dy = baseY - curY   //안드로이드 좌표계가 아래로 갈수록 -라서 반대로 해놓음
 
         val distance = sqrt(dx * dx + dy * dy)
 
@@ -107,6 +103,8 @@ class Joystick : UIObject() {
         }
     }
 
+    //플레이어가 UIManger에서 GetMovement호출하면 거기서 이거 호출해서
+    //조이스틱의 움직임을 플레이어로 주게 된다
     public fun GetMovement(): Movement {
         return movement
     }
