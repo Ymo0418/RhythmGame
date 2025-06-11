@@ -7,6 +7,7 @@ import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.RenderManager
+import com.example.rhythmgame.Manager.UIManager
 
 class Player: GameObject() {
     public var currentFrame = 0
@@ -27,6 +28,9 @@ class Player: GameObject() {
     }
 
     override fun Update(fTimeDelta: Float) {
+
+        TransformCom.position[0] += UIManager.GetMovement().x
+        TransformCom.position[1] += UIManager.GetMovement().y
 
         if(accum <= 0f)
         {
