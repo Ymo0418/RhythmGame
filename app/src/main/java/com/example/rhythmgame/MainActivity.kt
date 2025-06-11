@@ -3,6 +3,7 @@ package com.example.rhythmgame
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.rhythmgame.Manager.SoundManager
 import com.example.rhythmgame.MyGLRenderer
 import com.example.rhythmgame.R
 
@@ -12,6 +13,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         glView = MyGLSurfaceView(this)
+
         setContentView(glView)
     }
 

@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLUtils
 
-class Comp_Texture(context: Context, resId: Int) : Component() {
+open class Comp_Texture(context: Context, resId: Int) : Component() {
     public lateinit var textureID : IntArray
 
     init {

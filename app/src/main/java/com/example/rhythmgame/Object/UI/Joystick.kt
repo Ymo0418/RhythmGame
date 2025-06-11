@@ -1,59 +1,65 @@
-// app/src/main/java/com/example/rhythmgame/Object/Joystick.kt
 package com.example.rhythmgame.Object
 
-import android.hardware.input.InputManager
 import android.opengl.GLES20
-import android.util.Log
-import com.example.rhythmgame.Base.Object
+import android.view.MotionEvent
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
-import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
-import android.content.Context
+import com.example.rhythmgame.Manager.RenderManager
+import com.example.rhythmgame.Object.UI.UIObject
+import kotlin.math.sqrt
+import android.util.Log
 
+class Joystick : UIObject() {
+    private val texCom     = Add_Component("TextureCom_Joystick")   as Comp_Texture
+    private val vibuffer   = Add_Component("VIBufferCom")           as Comp_VIBuffer
+    private val shader     = Add_Component("ShaderCom_UI")          as Comp_Shader
 
-class Joystick(private val context: Context) : Object() {
-    private val texCom     = Add_Component("Texture_Joystick") as Comp_Texture
-    private val vibuffer   = Add_Component("VIBufferCom")  as Comp_VIBuffer
-    private val shader     = Add_Component("ShaderCom")     as Comp_Shader
-    private val KnobTrans  = Add_Component("TransformCom")     as Comp_Transform
+    private var baseX = 260f
+    private var baseY = 700f
+    private var curX = 260f
+    private var curY = 700f
 
-    private var isVisible = false
-    private var baseX = 0f
-    private var baseY = 0f
-    private var knobX = 0f
-    private var knobY = 0f
+    data class Movement(var x: Float, var y: Float)
+    private var movement = Movement(0f,0f)
 
     init {
-        Components.addAll(listOf(vibuffer, shader, texCom, KnobTrans))
-        // 베이스 크기
-        TransformCom.scale = floatArrayOf(0.3f, 0.3f, 1f)
+        Components.addAll(listOf(vibuffer, shader, texCom))
+        TransformCom.scale = floatArrayOf(0.1f, 0.1f, 1f)
     }
 
-    /** 터치 시작 시 호출되어 베이스와 노브를 초기화 */
-    fun show(x: Float, y: Float) {
-        isVisible = true
-        baseX = x; baseY = y
-        knobX = x; knobY = y
+    override fun Update(fTimeDelta: Float) {
+
+        TransformCom.position[0] = 10f
+        TransformCom.position[1] = 10f
+
+        val dx = curX - baseX
+        val dy = baseY - curY
+
+        val distance = sqrt(dx * dx + dy * dy)
+
+        if (distance > 0f) {
+            // 방향 단위벡터(normalize)
+            val dirX = dx / distance
+            val dirY = dy / distance
+
+            // 길이 제한
+            val clampedDistance = distance.coerceAtMost(100f)
+            val speed = clampedDistance / 100f
+
+            movement.x = dirX * speed * fTimeDelta
+            movement.y = dirY * speed * fTimeDelta
+        }
+        else {
+            movement.x = 0f
+            movement.y = 0f
+        }
     }
 
-    /** 드래그할 때마다 호출되어 노브 위치만 업데이트 */
-    fun move(x: Float, y: Float) {
-        KnobTrans.position[0] = x
-        KnobTrans.position[1] = y
-    }
+    override fun LateUpdate(fTimeDelta: Float) {
+        super.LateUpdate(fTimeDelta)
 
-    /** 터치가 끝났을 때 호출되어 조이스틱을 숨김 */
-    fun hide() {
-        isVisible = false
-    }
-
-    fun resize(screenW: Int, screenH: Int) {
-        val metrics  = context.resources.displayMetrics
-        val sizePx60 = metrics.density * 80f           // 60dp → px
-        val ndcW     = sizePx60 * 2f / screenW.toFloat()
-        val ndcH     = sizePx60 * 2f / screenH.toFloat()
-        KnobTrans.scale = floatArrayOf(ndcW, ndcH, 1f)
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
     }
 
     override fun Render(): Boolean {
@@ -67,13 +73,7 @@ class Joystick(private val context: Context) : Object() {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom.textureID[0])
         GLES20.glUniform1i(texSampler, 0)
         GLES20.glUniformMatrix4fv(worldLoc, 1, false, TransformCom.SRP, 0)
-        drawQuad(aPos, aTex)
 
-        return true
-
-    }
-
-    private fun drawQuad(aPos: Int, aTex: Int) {
         vibuffer.vertexBuffer.position(0)
         GLES20.glEnableVertexAttribArray(aPos)
         GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 0, vibuffer.vertexBuffer)
@@ -83,5 +83,31 @@ class Joystick(private val context: Context) : Object() {
         GLES20.glVertexAttribPointer(aTex, 2, GLES20.GL_FLOAT, false, 0, vibuffer.texCoordBuffer)
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+
+        return true
+    }
+
+    override fun OnTouch(event: MotionEvent?) {
+        //옳은 터치인지 체크
+
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                curX = event.x
+                curY = event.y
+            }
+
+            MotionEvent.ACTION_UP -> {
+                curX = baseX
+                curY = baseY
+            }
+            null -> {
+                curX = baseX
+                curY = baseY
+            }
+        }
+    }
+
+    public fun GetMovement(): Movement {
+        return movement
     }
 }
