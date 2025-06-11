@@ -9,8 +9,10 @@ import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
+import android.content.Context
 
-class Joystick : Object() {
+
+class Joystick(private val context: Context) : Object() {
     private val texCom     = Add_Component("Texture_Joystick") as Comp_Texture
     private val vibuffer   = Add_Component("VIBufferCom")  as Comp_VIBuffer
     private val shader     = Add_Component("ShaderCom")     as Comp_Shader
@@ -46,6 +48,14 @@ class Joystick : Object() {
         isVisible = false
     }
 
+    fun resize(screenW: Int, screenH: Int) {
+        val metrics  = context.resources.displayMetrics
+        val sizePx60 = metrics.density * 80f           // 60dp → px
+        val ndcW     = sizePx60 * 2f / screenW.toFloat()
+        val ndcH     = sizePx60 * 2f / screenH.toFloat()
+        KnobTrans.scale = floatArrayOf(ndcW, ndcH, 1f)
+    }
+
     override fun Render(): Boolean {
         shader.Use_Program()
         val worldLoc    = shader.Get_UniformAttribute("u_worldMatrix")
@@ -60,13 +70,7 @@ class Joystick : Object() {
         drawQuad(aPos, aTex)
 
         return true
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom.textureID[0])
-        GLES20.glUniform1i(texSampler, 0)
-        GLES20.glUniformMatrix4fv(worldLoc, 1, false, KnobTrans.SRP, 0)
-        drawQuad(aPos, aTex)
 
-        return true
     }
 
     private fun drawQuad(aPos: Int, aTex: Int) {

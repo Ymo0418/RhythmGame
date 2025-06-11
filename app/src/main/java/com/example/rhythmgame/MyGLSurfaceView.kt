@@ -3,10 +3,12 @@ package com.example.rhythmgame
 
 import android.content.Context
 import android.opengl.GLSurfaceView
+import android.util.Log
 import android.view.MotionEvent
 import com.example.rhythmgame.Object.Joystick
 import com.example.rhythmgame.Object.TestMario
 import com.example.rhythmgame.Manager.ObjectManager
+import com.example.rhythmgame.Object.XButton
 import kotlin.math.hypot
 
 class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
@@ -31,73 +33,61 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
         // [2] 화면 좌표 → OpenGL 정규화(-1..+1)
         val nx = (event.x / width.toFloat()) * 2f - 1f
         val ny = -((event.y / height.toFloat()) * 2f - 1f)
-
-        // [3] Joystick 객체 가져오기
-        val joystick = ObjectManager
-            .Get_Objects(ObjectManager.LayerType.UI)
-            .filterIsInstance<Joystick>()
-            .firstOrNull() ?: return true
-
-        // [4] Mario 객체 가져오기
-        val mario = ObjectManager
-            .Get_Objects(ObjectManager.LayerType.PLAYER)
-            .filterIsInstance<TestMario>()
-            .firstOrNull()
+// 2) UI 레이어에서 XButton·Joystick 꺼내기
+        val uiLayer  = ObjectManager.Get_Objects(ObjectManager.LayerType.UI)
+        val xBtn     = uiLayer.filterIsInstance<XButton>().firstOrNull()
+        val joystick = uiLayer.filterIsInstance<Joystick>().firstOrNull() ?: return true
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                // [5] 터치 시작:
-                //      조이스틱 베이스 표시,
-                //      드래그 초기점 설정,
-                //      Mario 방향·속도 초기화
-                joystick.show(nx, ny)
-                initialX = nx
-                initialY = ny
-
-                renderer.moveDirX = 0f
-                renderer.moveDirY = 0f
-                renderer.moveSpeed = 0f
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                // [6] 드래그 중: 조이스틱 노브만 이동
-                joystick.move(nx, ny)
-
-                // [7] 드래그 벡터 계산: (nx,ny) 대비 초기 클릭점
-                val dx = nx - initialX
-                val dy = ny - initialY
-                val distance = hypot(dx.toDouble(), dy.toDouble()).toFloat()
-
-                if (distance > 0f) {
-                    // [8] 방향 단위벡터(normalize)
-                    val dirX = dx / distance
-                    val dirY = dy / distance
-
-                    // [9] 속도 = 드래그 벡터 크기(distance),
-                    //      필요하다면 maxSpeed로 제한
-                    val speed = distance.coerceAtMost(renderer.maxSpeed)
-
-                    // [10] renderer에 방향과 속도 전달
-                    renderer.moveDirX = dirX
-                    renderer.moveDirY = dirY
-                    renderer.moveSpeed = speed
-                } else {
+                // 3) 버튼 클릭 우선
+                if (xBtn?.isInside(nx, ny) == true) {
+                    Log.d("XButton","XButton 클릭!")
+                    return true
+                }
+                // 4) 왼쪽 아래 1/4영역(nx<=0 && ny<=0)일 때만 조이스틱 시작
+                if (nx <= 0f && ny <= 0f) {
+                    joystick.show(nx, ny)
+                    initialX = nx
+                    initialY = ny
                     renderer.moveDirX = 0f
                     renderer.moveDirY = 0f
                     renderer.moveSpeed = 0f
                 }
+                return true
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                // 5) 왼쪽 아래 1/4영역일 때만 드래그 처리
+
+                if (nx <= 0f && ny <= 0f) {
+                    joystick.move(nx, ny)
+                    Log.d("XButton","드ㄱ래그 됨")
+                    val dx = nx - initialX
+                    val dy = ny - initialY
+                    val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
+                    if (dist > 0f) {
+                        val dirX  = dx / dist
+                        val dirY  = dy / dist
+                        val speed = dist.coerceAtMost(renderer.maxSpeed)
+                        renderer.moveDirX  = dirX
+                        renderer.moveDirY  = dirY
+                        renderer.moveSpeed = speed
+                    }
+                }
+                return true
             }
 
             MotionEvent.ACTION_UP,
             MotionEvent.ACTION_CANCEL -> {
-                // [11] 터치 종료:
-                //       조이스틱 숨김, Mario 정지
+                // 6) 왼쪽 아래였든 아니든, 조이스틱 숨기고 정지
                 joystick.hide()
-                renderer.moveDirX = 0f
-                renderer.moveDirY = 0f
+                renderer.moveDirX  = 0f
+                renderer.moveDirY  = 0f
                 renderer.moveSpeed = 0f
+                return true
             }
         }
-        return true
+        return super.onTouchEvent(event)
     }
 }
