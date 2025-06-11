@@ -5,9 +5,9 @@ import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Component
 import com.example.rhythmgame.Manager.ComponentManager
 
-open class Object : Base() {
-    val Components: MutableList<Component> = mutableListOf()
-    lateinit var TransformCom: Comp_Transform
+open class GameObject : Base() {
+    protected val Components: MutableList<Component> = mutableListOf()
+    protected lateinit var TransformCom: Comp_Transform
 
     init {
         TransformCom = Add_Component("TransformCom") as Comp_Transform

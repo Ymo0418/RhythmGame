@@ -1,9 +1,7 @@
 package com.example.rhythmgame.Manager
 
-import android.util.Log
-import androidx.constraintlayout.helper.widget.Layer
 import com.example.rhythmgame.Base.Base
-import com.example.rhythmgame.Base.Object
+import com.example.rhythmgame.Base.GameObject
 
 object ObjectManager : Base() {
     public enum class LayerType {
@@ -13,7 +11,7 @@ object ObjectManager : Base() {
         LayerType.CAMERA, LayerType.PLAYER, LayerType.MONSTER, LayerType.BACKGROUND, LayerType.UI
     )
 
-    private val Layers = mutableMapOf<LayerType, MutableList<Object>>()
+    private val Layers = mutableMapOf<LayerType, MutableList<GameObject>>()
 
     init {
         for(layer in LayerType.entries) {
@@ -37,21 +35,11 @@ object ObjectManager : Base() {
         }
     }
 
-    override fun Render(): Boolean {
-        for(layer in LayerOrder) {
-            Layers[layer]?.forEach {
-                if(!it.Render())
-                    return false
-            }
-        }
-        return true
-    }
-
-    public fun Add_Object(layer: LayerType, target: Object) {
+    public fun Add_Object(layer: LayerType, target: GameObject) {
         Layers[layer]?.add(target)
     }
 
-    public fun Get_Objects(layer:LayerType):MutableList<Object>{
+    public fun Get_Objects(layer: LayerType): MutableList<GameObject> {
         return Layers.getValue(layer)
     }
 }
