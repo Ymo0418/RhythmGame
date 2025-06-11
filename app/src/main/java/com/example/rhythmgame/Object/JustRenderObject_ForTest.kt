@@ -8,7 +8,7 @@ import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.RenderManager
 
-class JustRenderObject_ForTest(tex: String, scale: FloatArray, rot: FloatArray, pos: FloatArray, rg: RenderManager.RenderGroup) : GameObject() {
+class JustRenderObject(tex: String, scale: FloatArray, rot: FloatArray, pos: FloatArray, rg: RenderManager.RenderGroup) : GameObject() {
     private lateinit var rg: RenderManager.RenderGroup
 
     private lateinit var BufferCom: Comp_VIBuffer

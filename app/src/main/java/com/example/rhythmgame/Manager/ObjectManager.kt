@@ -5,10 +5,10 @@ import com.example.rhythmgame.Base.GameObject
 
 object ObjectManager : Base() {
     public enum class LayerType {
-        CAMERA, PLAYER, MONSTER, BACKGROUND
+        CAMERA, PLAYER, MONSTER, BACKGROUND, UI
     }
     private val LayerOrder = listOf(
-        LayerType.CAMERA, LayerType.PLAYER, LayerType.MONSTER, LayerType.BACKGROUND
+        LayerType.CAMERA, LayerType.PLAYER, LayerType.MONSTER, LayerType.BACKGROUND, LayerType.UI
     )
 
     private val Layers = mutableMapOf<LayerType, MutableList<GameObject>>()
