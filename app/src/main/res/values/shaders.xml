@@ -1,5 +1,41 @@
 <resources>
+    <string name="VS_Anim">
+            attribute vec4 a_Position;
+            attribute vec2 a_TexCoord;
+            uniform mat4 u_worldMatrix;
+            uniform mat4 u_vpMatrix;
+            uniform vec2 u_FrameOffset;
+            uniform vec2 u_FrameScale;
+            varying vec2 v_TexCoord;
+            void main() {
+              gl_Position = u_vpMatrix * u_worldMatrix * a_Position;
+              v_TexCoord = a_TexCoord * u_FrameScale + u_FrameOffset * u_FrameScale;
+            }
+    </string>
     <string name="VS_VtxPosTex">
+            attribute vec4 a_Position;
+            attribute vec2 a_TexCoord;
+            uniform mat4 u_worldMatrix;
+            uniform mat4 u_vpMatrix;
+            varying vec2 v_TexCoord;
+            void main() {
+              gl_Position = u_vpMatrix * u_worldMatrix * a_Position;
+              v_TexCoord = a_TexCoord;
+            }
+    </string>
+    <string name="FS_VtxPosTex">
+            precision mediump float;
+            varying vec2 v_TexCoord;
+            uniform sampler2D u_Texture;
+            void main() {
+              vec4 texColor = texture2D(u_Texture, v_TexCoord);
+              if (texColor.a &lt; 0.1) {
+                discard;
+              }
+              gl_FragColor = texColor;
+            }
+    </string>
+    <string name="VS_UI">
             attribute vec4 a_Position;
             attribute vec2 a_TexCoord;
             uniform mat4 u_worldMatrix;
@@ -9,13 +45,16 @@
               v_TexCoord = a_TexCoord;
             }
     </string>
-    <string name="FS_VtxPosTex">
+    <string name="FS_UI">
             precision mediump float;
             varying vec2 v_TexCoord;
             uniform sampler2D u_Texture;
             void main() {
-              gl_FragColor = texture2D(u_Texture, v_TexCoord);
+              vec4 texColor = texture2D(u_Texture, v_TexCoord);
+              if (texColor.a &lt; 0.1) {
+                discard;
+              }
+              gl_FragColor = texColor;
             }
     </string>
-
 </resources>
