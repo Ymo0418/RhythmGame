@@ -7,6 +7,8 @@ import android.opengl.GLUtils
 
 open class Comp_Texture(context: Context, resId: Int) : Component() {
     public lateinit var textureID : IntArray
+    public var width:Int
+    public var height:Int
 
     init {
         textureID = IntArray(1)
@@ -17,6 +19,8 @@ open class Comp_Texture(context: Context, resId: Int) : Component() {
         // 비트맵 로딩
         val options = BitmapFactory.Options().apply { inScaled = false }
         val bitmap = BitmapFactory.decodeResource(context.resources, resId, options)
+        width = bitmap.width
+        height = bitmap.height
 
         // 바인딩 및 파라미터 세팅
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID[0])

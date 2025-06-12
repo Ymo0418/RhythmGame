@@ -16,7 +16,7 @@ object Camera : GameObject() {
     init {
         TransformCom.position[1] = 1f
         TransformCom.position[2] = 5f
-        TransformCom.rotation[0] = 40f
+        TransformCom.rotation[0] = 0f
     }
 
     override fun Update(fTimeDelta: Float) {

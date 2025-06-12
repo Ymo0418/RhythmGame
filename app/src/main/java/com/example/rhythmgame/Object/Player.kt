@@ -10,7 +10,11 @@ import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.UIManager
 
 class Player: GameObject() {
-    public var currentFrame = 0
+    val bpm = 70f
+    val frameCount = 7
+    val totalDuration = 60f / bpm
+    val frameDuration = totalDuration / frameCount
+    public var currentFrame = 3
     var accum = 0f
 
     private lateinit var TextureCom: Comp_Texture
@@ -25,6 +29,9 @@ class Player: GameObject() {
         Components.add(TextureCom)
         Components.add(BufferCom)
         Components.add(ShaderCom)
+
+        TransformCom.position[0] = 3f
+        TransformCom.position[1] = 3f
     }
 
     override fun Update(fTimeDelta: Float) {
@@ -32,20 +39,16 @@ class Player: GameObject() {
         TransformCom.position[0] += UIManager.GetMovement().x
         TransformCom.position[1] += UIManager.GetMovement().y
 
-        if(accum <= 0f)
-        {
-            currentFrame++
-            if(currentFrame == 7)
-                currentFrame = 0
-
-            accum = 0.1f
+        accum += fTimeDelta
+        if (accum >= frameDuration) {
+            accum -= frameDuration
+            currentFrame = (currentFrame + 1) % frameCount
         }
-
-        accum -= fTimeDelta
 
         super.Update(fTimeDelta)
 
     }
+
 
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
