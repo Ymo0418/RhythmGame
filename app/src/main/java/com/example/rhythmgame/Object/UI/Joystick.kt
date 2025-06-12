@@ -15,6 +15,13 @@ class Joystick : UIObject() {
     private val vibuffer   = Add_Component("VIBufferCom")           as Comp_VIBuffer
     private val shader     = Add_Component("ShaderCom_UI")          as Comp_Shader
 
+    // 뷰 크기 (onSurfaceChanged 에서 세팅)
+    private var viewWidth = 0
+    private var viewHeight = 0
+
+    // 활성화 여부
+    private var isActive = false
+
     private var baseX = 260f
     private var baseY = 700f
     private var curX = 260f
@@ -26,6 +33,11 @@ class Joystick : UIObject() {
     init {
         Components.addAll(listOf(vibuffer, shader, texCom))
         TransformCom.scale = floatArrayOf(0.1f, 0.1f, 1f)
+    }
+
+    fun onSurfaceSizeChanged(width: Int, height: Int) {
+        viewWidth  = width
+        viewHeight = height
     }
 
     override fun Update(fTimeDelta: Float) {
@@ -88,17 +100,27 @@ class Joystick : UIObject() {
 
         when (event?.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                curX = event.x
-                curY = event.y
+                // 왼쪽 아래 1/4 영역인지 체크
+                if (event.x <= viewWidth / 2f && event.y >= viewHeight / 2f) {
+                    isActive = true
+                    curX = event.x
+                    curY = event.y
+                } else {
+                    isActive = false
+                }
             }
-
-            MotionEvent.ACTION_UP -> {
-                curX = baseX
-                curY = baseY
+            MotionEvent.ACTION_MOVE -> {
+                if (isActive) {
+                    curX = event.x
+                    curY = event.y
+                }
             }
-            null -> {
-                curX = baseX
-                curY = baseY
+            MotionEvent.ACTION_UP, null -> {
+                if (isActive) {
+                    curX = baseX
+                    curY = baseY
+                    isActive = false
+                }
             }
         }
     }
