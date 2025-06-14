@@ -12,8 +12,8 @@ import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.RenderManager
 
 //UIObject 상속받기
-class XButton(private val context: Context): UIObject() {
-    private val texCom     = Add_Component("Texture_xButton")   as Comp_Texture
+class YButton(private val context: Context): UIObject() {
+    private val texCom     = Add_Component("Texture_yButton")   as Comp_Texture
     private val vibuffer   = Add_Component("VIBufferCom")           as Comp_VIBuffer
     private val shader     = Add_Component("ShaderCom_UI")          as Comp_Shader
 
@@ -33,17 +33,24 @@ class XButton(private val context: Context): UIObject() {
         val mPx      = 20f * dm.density
         val bPx      = 60f * dm.density
 
-        touchLeftPx   = w - mPx - bPx
-        touchRightPx  = w - mPx
-        touchTopPx    = h - mPx - bPx
+        val xRight = w - mPx
+        val xLeft  = xRight - bPx
+
+        // 2) Y 버튼은 X 버튼의 왼쪽에 mPx 간격만큼 띄워서,
+        //    그 지점을 우측 경계로 하고 bPx 크기만큼 좌측으로 확장
+        touchRightPx  = xLeft - mPx
+        touchLeftPx   = touchRightPx - bPx
+
+        // 세로(상/하)는 X 버튼과 동일하게 아래에서 mPx 위, 위에서 bPx 만큼 내려온 지점
         touchBottomPx = h - mPx
+        touchTopPx    = touchBottomPx - bPx
 
         TransformCom.scale[0] = 0.07f
         TransformCom.scale[1] = 0.14f
     }
 
     override fun Update(fTimeDelta: Float) {
-        TransformCom.position[0] = 0.9f
+        TransformCom.position[0] = 0.7f
         TransformCom.position[1] = -0.7f
         super.Update(fTimeDelta)
     }
@@ -84,7 +91,7 @@ class XButton(private val context: Context): UIObject() {
                 // Down 시 영역 안이면 눌림 상태로
                 if (event.x in touchLeftPx..touchRightPx && event.y in touchTopPx..touchBottomPx) {
                     isPressed = true
-                    Log.e("XButton", "버튼 누름 시작")
+                    Log.e("YButton", "버튼 누름 시작")
                 }
             }
         }

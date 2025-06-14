@@ -33,6 +33,8 @@ class Joystick : UIObject() {
     init {
         Components.addAll(listOf(vibuffer, shader, texCom))
         TransformCom.scale = floatArrayOf(0.1f, 0.1f, 1f)
+
+
     }
 
     fun onSurfaceSizeChanged(width: Int, height: Int) {
