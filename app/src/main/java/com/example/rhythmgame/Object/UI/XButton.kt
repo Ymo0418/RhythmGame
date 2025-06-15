@@ -49,7 +49,8 @@ class XButton(private val context: Context): UIObject() {
     }
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BLEND, this)
+
     }
     override fun Render(): Boolean {
         shader.Use_Program()
@@ -57,11 +58,14 @@ class XButton(private val context: Context): UIObject() {
         val aPos = shader.Get_Attribute("a_Position")
         val aTex = shader.Get_Attribute("a_TexCoord")
         val texSampler = shader.Get_UniformAttribute("u_Texture")
+        val alphaLoc   = shader.Get_UniformAttribute("u_Alpha")
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom.textureID[0])
         GLES20.glUniform1i(texSampler, 0)
         GLES20.glUniformMatrix4fv(worldLoc, 1, false, TransformCom.SRP, 0)
+
+        GLES20.glUniform1f(alphaLoc, if (isPressed) 0.5f else 1.0f)
 
         vibuffer.vertexBuffer.position(0)
         GLES20.glEnableVertexAttribArray(aPos)
@@ -82,9 +86,17 @@ class XButton(private val context: Context): UIObject() {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 // Down 시 영역 안이면 눌림 상태로
-                if (event.x in touchLeftPx..touchRightPx && event.y in touchTopPx..touchBottomPx) {
+                if (event.x in touchLeftPx..touchRightPx
+                    && event.y in touchTopPx..touchBottomPx) {
+
                     isPressed = true
                     Log.e("XButton", "버튼 누름 시작")
+                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (isPressed) {
+                    isPressed = false
+                    Log.e("XButton", "버튼 해제")
                 }
             }
         }

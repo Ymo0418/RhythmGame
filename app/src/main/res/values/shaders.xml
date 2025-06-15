@@ -49,12 +49,13 @@
             precision mediump float;
             varying vec2 v_TexCoord;
             uniform sampler2D u_Texture;
+            uniform float u_Alpha;             <!-- 이 줄 추가 -->
             void main() {
               vec4 texColor = texture2D(u_Texture, v_TexCoord);
               if (texColor.a &lt; 0.1) {
                 discard;
               }
-              gl_FragColor = texColor;
+                gl_FragColor = vec4(texColor.rgb, texColor.a * u_Alpha);
             }
     </string>
 </resources>
