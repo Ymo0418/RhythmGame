@@ -21,6 +21,7 @@ import com.example.rhythmgame.Object.Player
 import com.example.rhythmgame.Object.Joystick
 import com.example.rhythmgame.Object.UI.UIObject
 import com.example.rhythmgame.Object.UI.XButton
+import com.example.rhythmgame.Object.UI.YButton
 
 class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(unused: javax.microedition.khronos.opengles.GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
@@ -80,7 +81,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.playeridle))
         ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field))
         ComponentManager.Register_Component("TextureCom_Joystick", Comp_Texture(context, R.drawable.joystick2))
-        ComponentManager.Register_Component("Texture_Button", Comp_Texture(context, R.drawable.x_button))
+        ComponentManager.Register_Component("Texture_xButton", Comp_Texture(context, R.drawable.x_button))
+        ComponentManager.Register_Component("Texture_yButton", Comp_Texture(context, R.drawable.y_button))
 
     }
 
@@ -94,11 +96,15 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         //객체 만들고
         val xButton = XButton(context)
-
         //오브젝트매니저에 넣고
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, xButton)
-
         //다른 오브젝트가 이 UI의 값을 사용할수있도록 매니저에 등록
         UIManager.SetXButton(xButton)
+
+        val yButton = YButton(context)
+        //오브젝트매니저에 넣고
+        ObjectManager.Add_Object(ObjectManager.LayerType.UI, yButton)
+        //다른 오브젝트가 이 UI의 값을 사용할수있도록 매니저에 등록
+        UIManager.SetXButton(yButton)
     }
 }

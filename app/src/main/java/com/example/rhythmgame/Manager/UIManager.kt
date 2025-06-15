@@ -4,10 +4,12 @@ import android.graphics.Paint.Join
 import com.example.rhythmgame.Base.Base
 import com.example.rhythmgame.Object.Joystick
 import com.example.rhythmgame.Object.UI.XButton
+import com.example.rhythmgame.Object.UI.YButton
 
 object UIManager: Base() {
     var joystick: Joystick? = null
     var xbutton: XButton? = null
+    var ybutton: YButton? = null
     //var dash: UIButton? = null
     //등등
 
@@ -29,5 +31,9 @@ object UIManager: Base() {
 
     fun SetXButton(ui: XButton) {
         xbutton = ui
+    }
+
+    fun SetXButton(ui: YButton) {
+        ybutton = ui
     }
 }
