@@ -102,7 +102,7 @@ class YButton(private val context: Context): UIObject() {
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (isPressed) {
                     isPressed = false
-                    Log.e("XButton", "버튼 해제")
+                    Log.e("YButton", "버튼 해제")
                 }
             }
         }

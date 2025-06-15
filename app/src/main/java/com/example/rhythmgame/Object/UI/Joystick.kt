@@ -22,10 +22,10 @@ class Joystick : UIObject() {
     // 활성화 여부
     private var isActive = false
 
-    private var baseX = 260f
-    private var baseY = 700f
-    private var curX = 260f
-    private var curY = 700f
+    private var baseX = 300f
+    private var baseY = 800f
+    private var curX = 300f
+    private var curY = 800f
 
     data class Movement(var x: Float, var y: Float)
     private var movement = Movement(0f,0f)
@@ -43,11 +43,25 @@ class Joystick : UIObject() {
         viewHeight = height
     }
 
+    fun pixelToNdcX(px: Float, viewW: Float): Float =
+        px / viewW * 2f - 1f
+
+    fun pixelToNdcY(py: Float, viewH: Float): Float =
+        1f - (py / viewH * 2f)
+
     override fun Update(fTimeDelta: Float) {
         val dx = curX - baseX
         val dy = baseY - curY   //안드로이드 좌표계가 아래로 갈수록 -라서 반대로 해놓음
 
         val distance = sqrt(dx * dx + dy * dy)
+
+        // 1) 픽셀 → NDC
+        val ndcBaseX = pixelToNdcX(baseX, viewWidth.toFloat())
+        val ndcBaseY = pixelToNdcY(baseY, viewHeight.toFloat())
+
+        // 2) TransformCom.position 에 반영
+        TransformCom.position[0] = ndcBaseX
+        TransformCom.position[1] = ndcBaseY
 
         if (distance > 0f) {
             // 방향 단위벡터(normalize)
@@ -70,7 +84,7 @@ class Joystick : UIObject() {
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
 
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BLEND, this)
     }
 
     override fun Render(): Boolean {
@@ -79,11 +93,16 @@ class Joystick : UIObject() {
         val aPos = shader.Get_Attribute("a_Position")
         val aTex = shader.Get_Attribute("a_TexCoord")
         val texSampler = shader.Get_UniformAttribute("u_Texture")
+        val alphaLoc   = shader.Get_UniformAttribute("u_Alpha")
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom.textureID[0])
         GLES20.glUniform1i(texSampler, 0)
         GLES20.glUniformMatrix4fv(worldLoc, 1, false, TransformCom.SRP, 0)
+
+        // 평소(비활성)엔 반투명, 활성(isActive)시엔 완전 불투명
+        val alpha = if (isActive) 1.0f else 0.5f
+        GLES20.glUniform1f(alphaLoc, alpha)
 
         vibuffer.vertexBuffer.position(0)
         GLES20.glEnableVertexAttribArray(aPos)
