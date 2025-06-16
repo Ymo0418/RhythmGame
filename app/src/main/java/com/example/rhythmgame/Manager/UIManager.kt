@@ -3,19 +3,27 @@ package com.example.rhythmgame.Manager
 import android.graphics.Paint.Join
 import com.example.rhythmgame.Base.Base
 import com.example.rhythmgame.Object.Joystick
+import com.example.rhythmgame.Object.UI.HP
 import com.example.rhythmgame.Object.UI.XButton
 import com.example.rhythmgame.Object.UI.YButton
 
 object UIManager: Base() {
     var joystick: Joystick? = null
+    var joystick2: Joystick? = null
     var xbutton: XButton? = null
     var ybutton: YButton? = null
+    var hp: HP? = null
+
     //var dash: UIButton? = null
     //등등
 
     //다른 오브젝트에게 값을 넘겨주고 싶은 UI를 여기(UI매니저)에 세팅해줘야함
     fun SetJoystick(ui: Joystick) {
         joystick = ui
+    }
+
+    fun SetJoystick2(ui: Joystick) {
+        joystick2 = ui
     }
 
     //다른 오브젝트에서 특정 UI의 특정 값을 필요로 하면 이런식으로
@@ -35,5 +43,9 @@ object UIManager: Base() {
 
     fun SetXButton(ui: YButton) {
         ybutton = ui
+    }
+
+    fun SetHP(ui: HP) {
+        hp = ui
     }
 }

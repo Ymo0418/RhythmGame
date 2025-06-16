@@ -8,9 +8,11 @@ import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Object.UI.UIObject
 import kotlin.math.sqrt
+
 import android.util.Log
 
 class Joystick : UIObject() {
+    private val texCom2   = Add_Component("TextureCom_Joystick2")   as Comp_Texture
     private val texCom     = Add_Component("TextureCom_Joystick")   as Comp_Texture
     private val vibuffer   = Add_Component("VIBufferCom")           as Comp_VIBuffer
     private val shader     = Add_Component("ShaderCom_UI")          as Comp_Shader
@@ -22,6 +24,9 @@ class Joystick : UIObject() {
     // 활성화 여부
     private var isActive = false
 
+    // 임시 행렬 버퍼
+    private val tmpM = FloatArray(16)  // 임시 행렬 버퍼
+
     private var baseX = 300f
     private var baseY = 800f
     private var curX = 300f
@@ -31,7 +36,7 @@ class Joystick : UIObject() {
     private var movement = Movement(0f,0f)
 
     init {
-        Components.addAll(listOf(vibuffer, shader, texCom))
+        Components.addAll(listOf(vibuffer, shader, texCom, texCom2))
         TransformCom.scale = floatArrayOf(0.1f, 0.1f, 1f)
 
         TransformCom.scale[0] = 0.1f
@@ -55,7 +60,7 @@ class Joystick : UIObject() {
 
         val distance = sqrt(dx * dx + dy * dy)
 
-        // 1) 픽셀 → NDC
+        // 1) 픽셀 → NDC 터치 중심점 찾아서 이미지에 전달용
         val ndcBaseX = pixelToNdcX(baseX, viewWidth.toFloat())
         val ndcBaseY = pixelToNdcY(baseY, viewHeight.toFloat())
 
