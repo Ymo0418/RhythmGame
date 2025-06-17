@@ -10,6 +10,7 @@ import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Object.UI.UIObject
+import android.app.Activity
 
 class GameOver(private val context: Context) : UIObject() {
     // 셰이더·버퍼·텍스처
@@ -18,9 +19,6 @@ class GameOver(private val context: Context) : UIObject() {
     private val texLogo   = Add_Component("Texture_GameOver")  as Comp_Texture
     private val texCont   = Add_Component("Texture_Continue")  as Comp_Texture
     private val texExit   = Add_Component("Texture_Exit_Game") as Comp_Texture
-
-    // 한 번만 보이도록
-    private var showing = false
 
     // 버튼 NDC 위치·크기
     private val size   = 0.5f
@@ -35,16 +33,68 @@ class GameOver(private val context: Context) : UIObject() {
     private var screenWidth = 0
     private var screenHeight = 0
 
+
+
+    private val btnW: Float   // 버튼 너비(px)
+    private val btnH: Float   // 버튼 높이(px)
+    //continue
+    private val contTouchLeft: Float
+    private val contTouchRight: Float
+    private val contTouchTop: Float
+    private val contTouchBottom: Float
+    //exit
+    private val exitTouchLeft: Float
+    private val exitTouchRight: Float
+    private val exitTouchTop: Float
+    private val exitTouchBottom: Float
+
+    init {
+        // 화면 크기 필요 (onSurfaceSizeChanged에서 계산해도 무방)
+        val dm = context.resources.displayMetrics
+        val w = dm.widthPixels.toFloat()
+        val h = dm.heightPixels.toFloat()
+
+        btnW = 0.3f * w // 원래 0.3 NDC × 화면 절반 → 0.3 × w 로 조정 (원하면 bPx 고정 크기도 가능)
+        btnH = 0.3f * h
+
+        // Continue 버튼: 화면 중앙 기준
+        contTouchLeft   = (w - btnW) / 2f
+        contTouchRight  = (w + btnW) / 2f
+        contTouchTop    = (h - btnH) / 2f
+        contTouchBottom = (h + btnH) / 2f
+
+        // Exit 버튼: 중앙에서 아래로 120dp만큼 띄움
+        val offsetDp = 120f
+        val offsetPx = offsetDp * dm.density
+
+        exitTouchLeft   = contTouchLeft
+        exitTouchRight  = contTouchRight
+        exitTouchTop    = contTouchTop + offsetPx
+        exitTouchBottom = contTouchBottom + offsetPx
+    }
+
+
+
     fun onSurfaceSizeChanged(w: Int, h: Int) {
         screenWidth  = w
         screenHeight = h
     }
 
 
+    // 한 번만 보이도록
+    private var showing = false
+
     /** 외부에서 호출하면 게임오버 화면이 뜹니다 */
     fun show() {
         showing = true
-        elapsed  = 0f
+    }
+
+    fun hide() {
+        showing = false
+    }
+
+    fun isShowing(): Boolean {
+        return showing
     }
 
     override fun Update(dt: Float) {
@@ -62,8 +112,7 @@ class GameOver(private val context: Context) : UIObject() {
     private val duration  = 1f       // 1초 동안 페이드 인
 
     override fun Render(): Boolean {
-        if (!showing) return true
-
+        if (!showing) return false
         shader.Use_Program()
         val uW    = shader.Get_UniformAttribute("u_worldMatrix")
         val uTex  = shader.Get_UniformAttribute("u_Texture")
@@ -119,40 +168,33 @@ class GameOver(private val context: Context) : UIObject() {
 
 
     override fun OnTouch(event: MotionEvent?) {
-            event ?: return
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    // 1. 각 버튼 중심을 NDC→픽셀로 변환
-                    val contCenterX = (posCont[0] + 1f) / 2f * screenWidth
-                    val contCenterY = (1f - (posCont[1] - 0.1f)) / 2f * screenHeight
-                    val exitCenterX = (posExit[0] + 1f) / 2f * screenWidth
-                    val exitCenterY = (1f - (posExit[1] - 0.1f)) / 2f * screenHeight
+        event ?: return
+        if (!showing) return
 
-                    val btnW = 0.3f * screenWidth / 2f   // btnSize * 화면 width/2
-                    val btnH = 0.3f * screenHeight / 2f
-
-                    // 2. 실제 터치좌표가 버튼 영역 내인지 확인
-                    fun inButton(x: Float, y: Float, cx: Float, cy: Float, bw: Float, bh: Float) =
-                        x in (cx - bw / 2)..(cx + bw / 2) && y in (cy - bh / 2)..(cy + bh / 2)
-
-                    // Continue
-                    if (inButton(event.x, event.y, contCenterX, contCenterY, btnW, btnH)) {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                when {
+                    // Continue 버튼
+                    event.x in contTouchLeft..contTouchRight &&
+                            event.y in contTouchTop..contTouchBottom -> {
                         Log.e("GameOver", "Continue 버튼 누름")
-                        //onContinue?.invoke()
+                        onContinue?.invoke()     // 여기에 콜백 호출!
                     }
-                    // Exit
-                    else if (inButton(event.x, event.y, exitCenterX, exitCenterY, btnW, btnH)) {
+                    // Exit 버튼
+                    event.x in exitTouchLeft..exitTouchRight &&
+                            event.y in exitTouchTop..exitTouchBottom -> {
                         Log.e("GameOver", "Exit 버튼 누름")
-                        //onExit?.invoke()
-                    } else {
+                        onExit?.invoke()         // 여기에 콜백 호출!
+                    }
+                    else -> {
                         Log.e("GameOver", "버튼이 아닌 곳을 터치함 (x=${event.x}, y=${event.y})")
                     }
                 }
-
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    Log.e("GameOver", "버튼 해제 또는 터치 취소")
-                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                Log.e("GameOver", "버튼 해제 또는 터치 취소")
             }
         }
+    }
 
 }

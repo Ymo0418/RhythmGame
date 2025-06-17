@@ -57,52 +57,16 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         UIManager.joystick?.onSurfaceSizeChanged(width, height)
         UIManager.hp?.onSurfaceSizeChanged(width, height)
-        gameOverUI.onSurfaceSizeChanged(width, height)
     }
-
-    // GameOver UI 인스턴스
-    private lateinit var gameOverUI: GameOver
-    // 한 번만 show() 호출용
-    private var gameOverStarted = false
-
-    private var fadeAlpha = 0f
-    private val fadeDuration = 1.0f    // 전체 페이드 인 시간 (2초)
-    private var fadeElapsed = 0f
-    private var fading = false
-
 
     override fun onDrawFrame(unused: javax.microedition.khronos.opengles.GL10?) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
-        // 게임 오버시 페이드 인
-        if (UIManager.isHpDead()) {
-            if (!fading) {
-                fading = true
-                fadeElapsed = 0f
-            }
-            if (fadeAlpha < 1f) {
-                fadeElapsed += 0.016f // dt
-                fadeAlpha = (fadeElapsed / fadeDuration).coerceAtMost(1f)
-            }
-
-            // ----- 검정 네모(알파로) 그리기 -----
-            GLES20.glEnable(GLES20.GL_BLEND)
-            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-            // ... (여기서 셰이더 u_Alpha=fadeAlpha 넘기고 사각형 그리기)
-            // 예시: fadeQuadShader.setAlpha(fadeAlpha) ... glDrawArrays()
-
-            // 페이드 다 끝났으면 게임오버 이미지 띄우기
-            if (fadeAlpha >= 1f) {
-                gameOverUI?.show()
-                gameOverUI?.Update(0.016f)
-                gameOverUI?.LateUpdate(0.016f)
-                gameOverUI?.Render()
-            }
-
-            return
-        }
-
         // 정상 게임 루프
+
+        if(!UIManager.GetGameOverShowing() && UIManager.isHpDead()) {
+            UIManager.SetGameOverShowing()
+        }
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
@@ -119,13 +83,13 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
     public fun OnTouchEvent(event: MotionEvent?) {
 
-        if (UIManager.isHpDead() && fadeAlpha >= 1f) {
-            // GameOverUI만 터치 처리 (다른 UI는 무시)
-            Log.e("OnTouchEvent", "gameOverUI error")
-
-            gameOverUI.OnTouch(event)
-            return
-        }
+        // GameOverUI만 터치 처리 (다른 UI는 무시)
+//        if (UIManager.isHpDead()) {
+//            Log.e("OnTouchEvent", "gameOverUI error")
+//
+//            gameOverUI.OnTouch(event)
+//            return
+//        }
 
         val UIObjects = ObjectManager.Get_Objects(ObjectManager.LayerType.UI)
         for (ui in UIObjects) {
@@ -161,6 +125,22 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("Texture_Exit_Game", Comp_Texture(context, R.drawable.exit_img))
     }
 
+    fun restartGame() {
+        // HP, UI, 플레이어 등 상태 초기화
+        UIManager.isGameOver = false
+        UIManager.gameOverTimer = -1f
+        UIManager.hp?.reset()
+        UIManager.Gameover?.hide()
+        // 필요하다면 플레이어나 몬스터 등도 초기화
+        // 예: Player/Monster의 위치와 상태도 리셋 필요시 추가
+        // ObjectManager에서 각 Layer 객체들을 모두 초기화/재생성하는 식으로 구현 가능
+
+        // 예: Player 재생성 (더 세밀한 리셋이 필요하면 Player에 reset() 추가)
+        // ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Player())
+        // ...
+    }
+
+
     private fun Ready_UI() {
         //UI추가하면 여기서 만들어야함
 
@@ -171,7 +151,6 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         val joystick2 = Joystick()
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, joystick2)
         UIManager.SetJoystick2(joystick2)
-
 
         //객체 만들고
         val xButton = XButton(context)
@@ -194,21 +173,22 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 //        val gameOver = GameOver(context)
 //        ObjectManager.Add_Object(ObjectManager.LayerType.UI, gameOver)
 //        UIManager.SetGameOver(gameOver)
-        gameOverUI = GameOver(context)
+        val gameOverUI = GameOver(context)
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, gameOverUI)
         UIManager.SetGameOver(gameOverUI)
 
-//        val Gameover = GameOver(context)
-//        ObjectManager.Add_Object(ObjectManager.LayerType.UI, Gameover)
-//        UIManager.SetGameOver(Gameover)
-//
-//        val Continue = GameOver(context)
-//        ObjectManager.Add_Object(ObjectManager.LayerType.UI, Continue)
-//        UIManager.SetContinue(Continue)
-//
-//        val ExitGame = GameOver(context)
-//        ObjectManager.Add_Object(ObjectManager.LayerType.UI, ExitGame)
-//        UIManager.SetExitGame(ExitGame)
+
+        gameOverUI.onContinue = {
+            restartGame()
+        }
+        gameOverUI.onExit = {
+            // context는 Activity에서 전달된 것이므로 캐스팅
+            if (context is Activity) {
+                (context as Activity).finish()
+            }
+            // 혹은 강제 종료는 System.exit(0)도 가능하나 finish() 권장
+        }
+
     }
 
     private fun Ready_Level() {

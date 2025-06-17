@@ -24,10 +24,6 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (UIManager.isGameOver) {
-            // 아무 동작 안 함
-            return false
-        }
         renderer.OnTouchEvent(event)
         return true
     }

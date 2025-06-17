@@ -10,6 +10,7 @@ import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Object.UI.UIObject
 import kotlin.math.sqrt
 import android.util.Log
+import com.example.rhythmgame.Manager.UIManager
 
 class Joystick : UIObject() {
     private val texCom     = Add_Component("TextureCom_Joystick")   as Comp_Texture
@@ -20,6 +21,8 @@ class Joystick : UIObject() {
     // 뷰 크기 (onSurfaceChanged 에서 세팅)
     private var viewWidth = 0
     private var viewHeight = 0
+
+    var showing = true  // 기본 보임
 
     // 활성화 여부
     private var isActive = false
@@ -81,6 +84,8 @@ class Joystick : UIObject() {
     }
 
     override fun Render(): Boolean {
+        if (UIManager.isGameOver) return true   // 게임오버면 그리지 말자
+
         shader.Use_Program()
         val worldLoc   = shader.Get_UniformAttribute("u_worldMatrix")
         val aPos       = shader.Get_Attribute("a_Position")
@@ -142,6 +147,7 @@ class Joystick : UIObject() {
     }
 
     override fun OnTouch(event: MotionEvent?) {
+        if (UIManager.isGameOver) return   // 게임오버면 그리지 말자
         event ?: return
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {

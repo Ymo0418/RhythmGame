@@ -67,6 +67,13 @@ object UIManager: Base() {
         Gameover = ui
     }
 
+    fun GetGameOverShowing(): Boolean {
+        return Gameover!!.isShowing()
+    }
+    fun SetGameOverShowing() {
+        Gameover!!.show()
+    }
+
 //    fun SetGameOver(ui: GameOver) {
 //        Gameover = ui
 //    }
