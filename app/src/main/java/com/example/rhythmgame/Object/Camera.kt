@@ -14,9 +14,7 @@ object Camera : GameObject() {
     val ViewProj= FloatArray(16)
 
     init {
-        TransformCom.position[1] = 1f
         TransformCom.position[2] = 5f
-        TransformCom.rotation[0] = 40f
     }
 
     override fun Update(fTimeDelta: Float) {
