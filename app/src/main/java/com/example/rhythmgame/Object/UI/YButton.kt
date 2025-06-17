@@ -10,6 +10,7 @@ import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.RenderManager
+import com.example.rhythmgame.Manager.UIManager
 
 //UIObject 상속받기
 class YButton(private val context: Context): UIObject() {
@@ -50,8 +51,8 @@ class YButton(private val context: Context): UIObject() {
     }
 
     override fun Update(fTimeDelta: Float) {
-        TransformCom.position[0] = 0.7f
-        TransformCom.position[1] = -0.7f
+        TransformCom.position[0] = 0.675f
+        TransformCom.position[1] = -0.725f
         super.Update(fTimeDelta)
     }
     override fun LateUpdate(fTimeDelta: Float) {
@@ -73,7 +74,8 @@ class YButton(private val context: Context): UIObject() {
         GLES20.glUniform1i(texSampler, 0)
         GLES20.glUniformMatrix4fv(worldLoc, 1, false, TransformCom.SRP, 0)
 
-        GLES20.glUniform1f(alphaLoc, if (isPressed) 0.5f else 1.0f)
+        val alpha = if (isPressed) 0.3f else 0.7f
+        GLES20.glUniform1f(alphaLoc, alpha)
 
         vibuffer.vertexBuffer.position(0)
         GLES20.glEnableVertexAttribArray(aPos)
@@ -97,6 +99,8 @@ class YButton(private val context: Context): UIObject() {
                 if (event.x in touchLeftPx..touchRightPx && event.y in touchTopPx..touchBottomPx) {
                     isPressed = true
                     Log.e("YButton", "버튼 누름 시작")
+                    UIManager.hp?.increaseFrame()
+
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {

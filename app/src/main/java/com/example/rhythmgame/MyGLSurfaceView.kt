@@ -4,6 +4,7 @@ package com.example.rhythmgame
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.view.MotionEvent
+import com.example.rhythmgame.Manager.UIManager
 
 class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
     private val renderer: MyGLRenderer
@@ -23,6 +24,10 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (UIManager.isGameOver) {
+            // 아무 동작 안 함
+            return false
+        }
         renderer.OnTouchEvent(event)
         return true
     }
