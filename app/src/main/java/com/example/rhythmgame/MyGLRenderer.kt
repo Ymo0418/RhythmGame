@@ -16,12 +16,16 @@ import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.SoundManager
 import com.example.rhythmgame.Manager.UIManager
+import com.example.rhythmgame.Manager.UIManager.joystick
 import com.example.rhythmgame.Object.Camera
 import com.example.rhythmgame.Object.JustRenderObject
 import com.example.rhythmgame.Object.Player
 import com.example.rhythmgame.Object.Joystick
 import com.example.rhythmgame.Object.Monster
+import com.example.rhythmgame.Object.UI.HP
 import com.example.rhythmgame.Object.UI.UIObject
+import com.example.rhythmgame.Object.UI.XButton
+import com.example.rhythmgame.Object.UI.YButton
 
 class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(unused: javax.microedition.khronos.opengles.GL10?, config: javax.microedition.khronos.egl.EGLConfig?) {
@@ -42,9 +46,20 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     //뷰포트 및 투영 매트릭스 등을 설정하는 데 사용
     override fun onSurfaceChanged(unused: javax.microedition.khronos.opengles.GL10?, width: Int, height: Int) {
         GLES20.glViewport(0, 0, width, height)
+
+        joystick?.onSurfaceSizeChanged(width, height)  //
+
     }
 
     override fun onDrawFrame(unused: javax.microedition.khronos.opengles.GL10?) {
+
+        if (UIManager.isGameOver) {
+            // 검은색 클리어만 하고 리턴
+            GLES20.glClearColor(0f, 0f, 0f, 1f)
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
+            return
+        }
+
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
         SoundManager.Update(0.016f)
@@ -80,13 +95,43 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.player_idle))
         ComponentManager.Register_Component("TextureCom_Player_Walk", Comp_Texture(context, R.drawable.player_walk))
         ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field))
-        ComponentManager.Register_Component("TextureCom_Joystick", Comp_Texture(context, R.drawable.joystick2))
+        ComponentManager.Register_Component("TextureCom_Joystick", Comp_Texture(context, R.drawable.joystickmain))
+        ComponentManager.Register_Component("TextureCom_Joystick2", Comp_Texture(context, R.drawable.joystick2))
+
+        ComponentManager.Register_Component("Texture_xButton", Comp_Texture(context, R.drawable.x_button))
+        ComponentManager.Register_Component("Texture_yButton", Comp_Texture(context, R.drawable.y_button))
+        ComponentManager.Register_Component("Texture_HP", Comp_Texture(context, R.drawable.hp_img))
+
     }
 
     private fun Ready_UI() {
+        //UI추가하면 여기서 만들어야함
+
         val joystick = Joystick()
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, joystick)
         UIManager.SetJoystick(joystick)
+
+        val joystick2 = Joystick()
+        ObjectManager.Add_Object(ObjectManager.LayerType.UI, joystick2)
+        UIManager.SetJoystick2(joystick2)
+
+
+        //객체 만들고
+        val xButton = XButton(context)
+        //오브젝트매니저에 넣고
+        ObjectManager.Add_Object(ObjectManager.LayerType.UI, xButton)
+        //다른 오브젝트가 이 UI의 값을 사용할수있도록 매니저에 등록
+        UIManager.SetXButton(xButton)
+
+        val yButton = YButton(context)
+        ObjectManager.Add_Object(ObjectManager.LayerType.UI, yButton)
+        UIManager.SetXButton(yButton)
+
+        val hp = HP()
+        //오브젝트매니저에 넣고
+        ObjectManager.Add_Object(ObjectManager.LayerType.UI, hp)
+        //다른 오브젝트가 이 UI의 값을 사용할수있도록 매니저에 등록
+        UIManager.SetHP(hp)
     }
 
     private fun Ready_Level() {

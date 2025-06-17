@@ -13,10 +13,6 @@ import com.example.rhythmgame.Manager.SoundManager
 import com.example.rhythmgame.Manager.UIManager
 
 class Player: RhythmObject() {
-    val bpm = 68f
-    val frameCount = 7
-    val totalDuration = 60f / bpm
-    val frameDuration = totalDuration / frameCount
     public var currentFrame = 3
     var accum = 0f
     var bMove = false
@@ -59,6 +55,7 @@ class Player: RhythmObject() {
 
         currentFrame = (beatRatio * if(bMove) 8f else 7f).toInt()
     }
+
 
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)

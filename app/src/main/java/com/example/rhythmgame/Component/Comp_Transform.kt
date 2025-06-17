@@ -12,16 +12,16 @@ class Comp_Transform : Component() {
     override fun LateUpdate(fTimeDelta: Float) {
         Matrix.setIdentityM(SRP, 0)
 
-        //크기
-        Matrix.scaleM(SRP, 0, scale[0], scale[1], scale[2])
+        //이동
+        Matrix.translateM(SRP, 0, position[0], position[1], position[2])
 
         //자전
         Matrix.rotateM(SRP, 0, rotation[0], 1f, 0f, 0f)
         Matrix.rotateM(SRP, 0, rotation[1], 0f, 1f, 0f)
         Matrix.rotateM(SRP, 0, rotation[2], 0f, 0f, 1f)
 
-        //이동
-        Matrix.translateM(SRP, 0, position[0], position[1], position[2])
+        //크기
+        Matrix.scaleM(SRP, 0, scale[0], scale[1], scale[2])
     }
 
     override fun Clone(): Comp_Transform {
