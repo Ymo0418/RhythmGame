@@ -1,3 +1,4 @@
+
 package com.example.rhythmgame.Object
 
 import android.opengl.GLES20

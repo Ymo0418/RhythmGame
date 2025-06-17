@@ -26,4 +26,5 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         glView.onPause()
     }
+
 }

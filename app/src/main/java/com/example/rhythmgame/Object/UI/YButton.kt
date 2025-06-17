@@ -61,6 +61,8 @@ class YButton(private val context: Context): UIObject() {
 
     }
     override fun Render(): Boolean {
+        if (UIManager.isGameOver) return true  // 게임오버면 그리지 말자
+
         shader.Use_Program()
         val worldLoc    = shader.Get_UniformAttribute("u_worldMatrix")
         val aPos = shader.Get_Attribute("a_Position")
@@ -92,6 +94,8 @@ class YButton(private val context: Context): UIObject() {
 
     //이 함수 override하면 입력받을수있음
     override fun OnTouch(event: MotionEvent?) {
+        if (UIManager.isGameOver) return   // 게임오버면 그리지 말자
+
         event ?: return
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {

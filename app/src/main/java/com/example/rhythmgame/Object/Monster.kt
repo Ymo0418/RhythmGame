@@ -34,9 +34,6 @@ class Monster: GameObject() {
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
 
-        if(ColliderCom.isCollide)
-            Log.e("gggg", "Ggggg")
-
         RenderManager.Add_RenderObject(RenderManager.RenderGroup.NONBLEND, this)
     }
 
