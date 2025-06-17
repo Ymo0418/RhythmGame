@@ -2,63 +2,40 @@ package com.example.rhythmgame.Object
 
 import android.opengl.GLES20
 import android.util.Log
+import androidx.constraintlayout.motion.widget.Debug
 import com.example.rhythmgame.Base.GameObject
+import com.example.rhythmgame.Component.Comp_Collider
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
-import com.example.rhythmgame.Component.Comp_Collider
 import com.example.rhythmgame.Manager.CollisionManager
 import com.example.rhythmgame.Manager.RenderManager
-import com.example.rhythmgame.Manager.SoundManager
-import com.example.rhythmgame.Manager.UIManager
 
-class Player: RhythmObject() {
-    public var currentFrame = 3
-    var accum = 0f
-    var bMove = false
-
-    private lateinit var IdleTextureCom: Comp_Texture
-    private lateinit var WalkTextureCom: Comp_Texture
+class Monster: GameObject() {
+    private lateinit var TextureCom: Comp_Texture
     private lateinit var BufferCom: Comp_VIBuffer
     private lateinit var ShaderCom: Comp_Shader
     private lateinit var ColliderCom: Comp_Collider
 
     init {
-        IdleTextureCom = Add_Component("TextureCom_Player_Idle") as Comp_Texture
-        WalkTextureCom = Add_Component("TextureCom_Player_Walk") as Comp_Texture
+        TextureCom = Add_Component("TextureCom_Player_Idle") as Comp_Texture
         BufferCom = Add_Component("VIBufferCom") as Comp_VIBuffer
         ShaderCom = Add_Component("ShaderCom_Anim") as Comp_Shader
         ColliderCom = Add_Component("ColliderCom") as Comp_Collider
         ColliderCom.SetColliderInfo(TransformCom, 1f, 1f)
-        CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.PLAYER, ColliderCom)
+        CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.MONSTER, ColliderCom)
 
-        Components.add(IdleTextureCom)
-        Components.add(WalkTextureCom)
+        Components.add(TextureCom)
         Components.add(BufferCom)
         Components.add(ShaderCom)
         Components.add(ColliderCom)
     }
 
-    override fun Update(fTimeDelta: Float) {
-        super.Update(fTimeDelta)
-
-        val joystickMove = UIManager.GetMovement()
-
-        TransformCom.position[0] += joystickMove.x
-        TransformCom.position[1] += joystickMove.y
-
-        if(joystickMove.x == 0f &&
-            joystickMove.y == 0f)
-            bMove = false
-        else
-            bMove = true
-
-        currentFrame = (beatRatio * if(bMove) 8f else 7f).toInt()
-    }
-
-
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
+
+        if(ColliderCom.isCollide)
+            Log.e("gggg", "Ggggg")
 
         RenderManager.Add_RenderObject(RenderManager.RenderGroup.NONBLEND, this)
     }
@@ -88,14 +65,14 @@ class Player: RhythmObject() {
         GLES20.glUniformMatrix4fv(vpLoc, 1, false, Camera.Get_ViewProj(), 0)
 
         // 애니메이션 정보 연결
-        val texScale = floatArrayOf(1.0f / if(bMove) 8f else 7f, 1.0f)
-        val texOffset = floatArrayOf(currentFrame.toFloat(), 0f)
+        val texScale = floatArrayOf(1.0f / 7.0f, 1.0f)
+        val texOffset = floatArrayOf(0f, 0f)
         GLES20.glUniform2fv(scaleLoc, 1, texScale, 0)
         GLES20.glUniform2fv(offsetLoc, 1, texOffset, 0)
 
         // 텍스처 바인딩
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, if(bMove) WalkTextureCom.textureID[0] else IdleTextureCom.textureID[0])
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, TextureCom.textureID[0])
         GLES20.glUniform1i(samplerLoc, 0)
 
         // 사각형 그리기 (Triangle Strip)
