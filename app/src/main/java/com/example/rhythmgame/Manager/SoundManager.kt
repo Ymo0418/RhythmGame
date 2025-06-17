@@ -4,22 +4,21 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.SoundPool
-import android.net.Uri
-import android.os.Looper
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.common.MediaItem
+import android.util.Log
 import com.example.rhythmgame.Base.Base
 
 object SoundManager: Base() {
 
-    private var bgmPlayer: ExoPlayer? = null
+    private var bgmPlayer: MediaPlayer? = null
     private lateinit var sfxPlayer: SoundPool
     private val sfxMap = mutableMapOf<String, Int>()
 
-    private var bpm = 60f
-    private var beatInterval = 0f
+    private var bpm = 68f
+    private var startTime = System.currentTimeMillis()
+    private var beatInterval_ms = 60000f / bpm
     private var lastBeatTime = 0L
     private var beatWindow = 100L //ms 단위의 혀용 오차
+    private var beatRatio = 0f
 
     fun Init(context: Context) {
         val audioAttributes = AudioAttributes.Builder()
@@ -33,18 +32,16 @@ object SoundManager: Base() {
             .build()
     }
 
-    fun Get_ValidBeat(): Boolean {
-        val now = System.currentTimeMillis()
-        val timeSinceLast = now - lastBeatTime
+    override fun Update(fTimeDelta: Float) {
+        var now = System.currentTimeMillis()
+        var elapsed = now - startTime
 
-        if (timeSinceLast >= beatInterval) {
-            // 다음 박자로 넘어감
-            lastBeatTime += beatInterval.toLong()
-        }
+        val elapsedInCurrentBeat = elapsed % beatInterval_ms
+        beatRatio = (elapsedInCurrentBeat / beatInterval_ms)
+    }
 
-        // 지금이 박자 근처인지 확인 (허용 오차 범위 내면 true 반환)
-        val delta = Math.abs(now - lastBeatTime)
-        return delta <= beatWindow
+    fun GetBeatRatio(): Float {
+        return beatRatio
     }
 
     fun LoadSE(context: Context, name: String, resId: Int) {
@@ -58,33 +55,44 @@ object SoundManager: Base() {
         }
     }
 
-    fun PlayBGM(context: Context, resId: Int, loop: Boolean = true) {
+    fun PlayBGM(context: Context, resId: Int, speed: Float = 1f, loop: Boolean = true) {
+        StopBGM()
 
-        this.bpm = bpm
-        this.beatInterval = 60000f / bpm  // 1박자 간격 (ms)
-        lastBeatTime = System.currentTimeMillis()
-
-        val uri = Uri.parse("android.resource://${context.packageName}/$resId")
-
-        android.os.Handler(Looper.getMainLooper()).post() {
-            bgmPlayer = ExoPlayer.Builder(context).build().apply {
-                setMediaItem((MediaItem.fromUri(uri)))
-                repeatMode = ExoPlayer.REPEAT_MODE_ONE
-                prepare()
-                play()
+        bgmPlayer = MediaPlayer.create(context, resId)?.apply {
+            isLooping = loop
+            setOnErrorListener { mp, what, extra ->
+                Log.e("SoundManager", "BGM error: what=$what, extra=$extra")
+                StopBGM()
+                true
             }
+
+            start()
+
+            val params = playbackParams
+            params.speed = speed
+            playbackParams = params
+        }
+    }
+
+    fun ChangeSpeedBGM(speed: Float = 1f) {
+        bgmPlayer?.let {
+            val params = it.playbackParams
+            params.speed = speed
+            it.playbackParams = params
         }
     }
 
     fun StopBGM() {
-        bgmPlayer?.stop()
-        bgmPlayer?.release()
+        bgmPlayer?.let {
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.release()
+        }
         bgmPlayer = null
     }
 
     fun Release() {
-        sfxPlayer.release()
-        bgmPlayer?.release()
-        bgmPlayer = null
+        StopBGM()
     }
 }
