@@ -25,17 +25,28 @@ class HP: UIObject() {
     private var currentFrame = rows - 1  // 기본: 맨 위
 
 
+//                    UIManager.hp?.decreaseFrame()
 
     /** 입력1이 들어오면 호출하여 인덱스를 감소시킵니다. 최저 0까지. */
     fun decreaseFrame() {
-        if (currentFrame > 1) {
+        if (currentFrame > 0) {
             currentFrame--
-        } else {
-            // 이미 0인 상태에서 추가 감소 시 → Game Over
+        }
+        if (currentFrame == 0) {
             UIManager.isGameOver = true
+            UIManager.gameOverTimer = 0f // 타이머 초기화
         }
     }
-//                    UIManager.hp?.decreaseFrame()
+    fun reset() {
+        currentFrame = rows - 1
+    }
+
+    /** 외부에서 currentFrame을 읽어올 수 있도록 공개 */
+    fun getCurrentFrame(): Int = currentFrame
+
+    /** HP가 0프레임(체력0)인지 여부 */
+    fun isDead(): Boolean = currentFrame == 0
+
 
     /** 입력2가 들어오면 호출하여 인덱스를 증가시킵니다. 최대 rows-1까지. */
     fun increaseFrame() {
@@ -67,6 +78,8 @@ class HP: UIObject() {
     }
 
     override fun Render(): Boolean {
+        if (UIManager.isGameOver) return true   // 게임오버면 그리지 말자
+
         shader.Use_Program()
         val uWorld   = shader.Get_UniformAttribute("u_worldMatrix")
         val aPos     = shader.Get_Attribute("a_Position")
