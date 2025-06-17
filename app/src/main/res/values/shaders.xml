@@ -49,8 +49,14 @@
             precision mediump float;
             varying vec2 v_TexCoord;
             uniform sampler2D u_Texture;
-            uniform float u_Alpha;             <!-- 이 줄 추가 -->
+            uniform float u_Alpha;
+            uniform bool u_UseSolid;
+            uniform vec4 u_SolidColor;
             void main() {
+                if(u_UseSolid) {
+                gl_FragColor = u_SolidColor;
+                return;
+              }
               vec4 texColor = texture2D(u_Texture, v_TexCoord);
               if (texColor.a &lt; 0.1) {
                 discard;

@@ -54,6 +54,14 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(unused: javax.microedition.khronos.opengles.GL10?) {
+
+        if (UIManager.isGameOver) {
+            // 검은색 클리어만 하고 리턴
+            GLES20.glClearColor(0f, 0f, 0f, 1f)
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
+            return
+        }
+
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         ObjectManager.Update(0.016f)
         ObjectManager.LateUpdate(0.016f)
@@ -81,7 +89,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.playeridle))
         ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field))
-        ComponentManager.Register_Component("TextureCom_Joystick", Comp_Texture(context, R.drawable.joystick2))
+        ComponentManager.Register_Component("TextureCom_Joystick", Comp_Texture(context, R.drawable.joystickmain))
         ComponentManager.Register_Component("TextureCom_Joystick2", Comp_Texture(context, R.drawable.joystick2))
 
         ComponentManager.Register_Component("Texture_xButton", Comp_Texture(context, R.drawable.x_button))

@@ -74,7 +74,8 @@ class YButton(private val context: Context): UIObject() {
         GLES20.glUniform1i(texSampler, 0)
         GLES20.glUniformMatrix4fv(worldLoc, 1, false, TransformCom.SRP, 0)
 
-        GLES20.glUniform1f(alphaLoc, if (isPressed) 0.5f else 1.0f)
+        val alpha = if (isPressed) 0.3f else 0.7f
+        GLES20.glUniform1f(alphaLoc, alpha)
 
         vibuffer.vertexBuffer.position(0)
         GLES20.glEnableVertexAttribArray(aPos)

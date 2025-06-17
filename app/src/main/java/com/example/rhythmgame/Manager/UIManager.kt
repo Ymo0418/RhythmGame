@@ -14,6 +14,13 @@ object UIManager: Base() {
     var ybutton: YButton? = null
     var hp: HP? = null
 
+    // Game over 플래그
+    var isGameOver = false
+
+    fun setHPBar(h: HP) {
+        hp = h
+    }
+
     //var dash: UIButton? = null
     //등등
 
