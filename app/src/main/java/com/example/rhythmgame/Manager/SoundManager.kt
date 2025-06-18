@@ -16,8 +16,7 @@ object SoundManager: Base() {
     private var bpm = 68f
     private var startTime = System.currentTimeMillis()
     private var beatInterval_ms = 60000f / bpm
-    private var lastBeatTime = 0L
-    private var beatWindow = 100L //ms 단위의 혀용 오차
+    private var beatWindow = 0.1f //혀용 오차
     private var beatRatio = 0f
 
     fun Init(context: Context) {
@@ -42,6 +41,11 @@ object SoundManager: Base() {
 
     fun GetBeatRatio(): Float {
         return beatRatio
+    }
+
+    fun GetBeatValid(): Boolean {
+        return (beatRatio < beatWindow ||
+            beatRatio > (1f - beatWindow))
     }
 
     fun LoadSE(context: Context, name: String, resId: Int) {

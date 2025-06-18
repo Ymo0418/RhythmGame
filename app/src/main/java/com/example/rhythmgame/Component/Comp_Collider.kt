@@ -1,7 +1,5 @@
 package com.example.rhythmgame.Component
 
-import com.example.rhythmgame.Manager.RenderManager
-
 class Comp_Collider(): Component() {
     var left = 0f
     var top = 0f
@@ -9,6 +7,7 @@ class Comp_Collider(): Component() {
     var bottom = 0f
     var parentPos = floatArrayOf()
 
+    var pushRatio = 1
     var value = 0
     var isCollide = false
     var collideInfo = 0
@@ -16,13 +15,14 @@ class Comp_Collider(): Component() {
     init {
     }
 
-    public fun SetColliderInfo(parentTransform: Comp_Transform, width:Float, height:Float,
+    public fun SetColliderInfo(parentTransform: Comp_Transform, pushRatio: Int, width:Float, height:Float,
                                offsetX:Float = 0f, offsetY : Float = 0f) {
         parentPos = parentTransform.position
         left = offsetX - width / 2f
         right = offsetX + width / 2f
         top = offsetY + height / 2f
         bottom = offsetY - height / 2f
+        this.pushRatio = pushRatio
     }
 
     override fun Update(fTimeDelta: Float) {

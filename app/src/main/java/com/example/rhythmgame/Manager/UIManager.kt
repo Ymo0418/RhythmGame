@@ -21,9 +21,6 @@ object UIManager: Base() {
         hp = h
     }
 
-    //var dash: UIButton? = null
-    //등등
-
     //다른 오브젝트에게 값을 넘겨주고 싶은 UI를 여기(UI매니저)에 세팅해줘야함
     fun SetJoystick(ui: Joystick) {
         joystick = ui

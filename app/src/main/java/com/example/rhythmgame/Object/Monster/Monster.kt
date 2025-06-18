@@ -1,41 +1,66 @@
-package com.example.rhythmgame.Object
+package com.example.rhythmgame.Object.Monster
 
 import android.opengl.GLES20
 import android.util.Log
-import androidx.constraintlayout.motion.widget.Debug
-import com.example.rhythmgame.Base.GameObject
 import com.example.rhythmgame.Component.Comp_Collider
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
+import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.CollisionManager
 import com.example.rhythmgame.Manager.RenderManager
+import com.example.rhythmgame.Object.Camera
+import com.example.rhythmgame.Object.RhythmObject
+import kotlin.math.sqrt
 
-class Monster: GameObject() {
-    private lateinit var TextureCom: Comp_Texture
-    private lateinit var BufferCom: Comp_VIBuffer
-    private lateinit var ShaderCom: Comp_Shader
-    private lateinit var ColliderCom: Comp_Collider
+abstract class Monster(playerTrans: Comp_Transform): RhythmObject() {
+    protected var playerPos = floatArrayOf()
+    protected var direction = floatArrayOf()
+    protected var currentFrame = 0
+    protected var preFrame = 0
+    protected var nonMoveCount = 0
+    protected var moveCount = 3       //이만큼 하면 움직임
+    protected var curState = 0
+    protected var stateSpriteCounts = intArrayOf()
+    protected var speed = 1f
+    protected var hp = 1
+
+    protected lateinit var BufferCom: Comp_VIBuffer
+    protected lateinit var ShaderCom: Comp_Shader
+    protected lateinit var ColliderCom: Comp_Collider
+    protected lateinit var TextureComs: Array<Comp_Texture>
 
     init {
-        TextureCom = Add_Component("TextureCom_Player_Idle") as Comp_Texture
+        playerPos = playerTrans.position
+
         BufferCom = Add_Component("VIBufferCom") as Comp_VIBuffer
         ShaderCom = Add_Component("ShaderCom_Anim") as Comp_Shader
         ColliderCom = Add_Component("ColliderCom") as Comp_Collider
-        ColliderCom.SetColliderInfo(TransformCom, 1f, 1f)
         CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.MONSTER, ColliderCom)
 
-        Components.add(TextureCom)
         Components.add(BufferCom)
         Components.add(ShaderCom)
         Components.add(ColliderCom)
     }
 
+    override fun Update(fTimeDelta: Float) {
+        super.Update(fTimeDelta)
+
+        preFrame = currentFrame
+        currentFrame = (beatRatio * stateSpriteCounts[curState]).toInt()
+    }
+
+    protected fun CalcDirection() {
+        val dx = (playerPos[0] - TransformCom.position[0])
+        val dy = (playerPos[1] - TransformCom.position[1])
+        val len = sqrt(dx * dx + dy * dy)
+        require(len != 0f)
+
+        direction = floatArrayOf(dx / len, dy / len)
+    }
+
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
-
-        if(ColliderCom.isCollide)
-            Log.e("gggg", "Ggggg")
 
         RenderManager.Add_RenderObject(RenderManager.RenderGroup.NONBLEND, this)
     }
@@ -65,14 +90,14 @@ class Monster: GameObject() {
         GLES20.glUniformMatrix4fv(vpLoc, 1, false, Camera.Get_ViewProj(), 0)
 
         // 애니메이션 정보 연결
-        val texScale = floatArrayOf(1.0f / 7.0f, 1.0f)
-        val texOffset = floatArrayOf(0f, 0f)
+        val texScale = floatArrayOf(1.0f / 6.0f, 1.0f)
+        val texOffset = floatArrayOf(currentFrame.toFloat(), 0f)
         GLES20.glUniform2fv(scaleLoc, 1, texScale, 0)
         GLES20.glUniform2fv(offsetLoc, 1, texOffset, 0)
 
         // 텍스처 바인딩
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, TextureCom.textureID[0])
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, TextureComs[curState].textureID[0])
         GLES20.glUniform1i(samplerLoc, 0)
 
         // 사각형 그리기 (Triangle Strip)

@@ -9,8 +9,12 @@ import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
+import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Manager.RenderManager
+import com.example.rhythmgame.Manager.SoundManager
 import com.example.rhythmgame.Manager.UIManager
+import com.example.rhythmgame.Object.Monster.Skill
+import kotlin.random.Random
 
 //UIObject 상속받기
 class XButton(private val context: Context): UIObject() {
@@ -19,6 +23,8 @@ class XButton(private val context: Context): UIObject() {
     private val shader     = Add_Component("ShaderCom_UI")          as Comp_Shader
 
     private var isPressed = false
+    private var cooldown = 3f
+    private var curCooldown = 0f
 
     // 버튼 터치 영역 (픽셀 기준)
     private val touchLeftPx: Float
@@ -95,15 +101,22 @@ class XButton(private val context: Context): UIObject() {
                     && event.y in touchTopPx..touchBottomPx) {
 
                     isPressed = true
-                    Log.e("XButton", "버튼 누름 시작")
-                    UIManager.hp?.decreaseFrame()
 
+                    if(SoundManager.GetBeatValid())
+                    {
+                        val Monsters = ObjectManager.Get_Objects(ObjectManager.LayerType.MONSTER)
+                        if(Monsters.isNotEmpty()) {
+                            val random = Random.nextInt(0, Monsters.size)
+
+                            val Skill = Skill(Monsters[random].GetTransformComp())
+                            ObjectManager.Add_Object(ObjectManager.LayerType.SKILL, Skill)
+                        }
+                    }
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (isPressed) {
                     isPressed = false
-                    Log.e("XButton", "버튼 해제")
                 }
             }
         }

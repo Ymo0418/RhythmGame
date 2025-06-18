@@ -6,8 +6,10 @@ import android.view.MotionEvent
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
+import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.UIManager
+import com.example.rhythmgame.Object.Player
 
 class HP: UIObject() {
     private val texCom    = Add_Component("Texture_HP") as Comp_Texture
@@ -23,10 +25,8 @@ class HP: UIObject() {
     private val cols = 1
 
     private var currentFrame = rows - 1  // 기본: 맨 위
+    private var hp: Int? = null
 
-
-
-    /** 입력1이 들어오면 호출하여 인덱스를 감소시킵니다. 최저 0까지. */
     fun decreaseFrame() {
         if (currentFrame > 1) {
             currentFrame--
@@ -41,7 +41,6 @@ class HP: UIObject() {
     fun increaseFrame() {
         currentFrame = (currentFrame + 1).coerceAtMost(rows - 1)
     }
-//                    UIManager.hp?.increaseFrame()
 
     fun onSurfaceSizeChanged(w:Int,h:Int) {
         viewW = w.toFloat()
@@ -57,13 +56,25 @@ class HP: UIObject() {
 
     override fun Update(fTimeDelta: Float) {
         super.Update(fTimeDelta)
-        // HP 변화에 따라 currentFrame을 설정하세요.
-        // 예: 100% → frame=0, 80%→1, ... 0%→4
+
+        val player = ObjectManager.Get_Objects(ObjectManager.LayerType.PLAYER).first() as Player
+        hp = player.hp
+
+        if(hp!! > 499)
+            currentFrame = 4
+        else if(hp!! > 250)
+            currentFrame = 3
+        else if(hp!! > 100)
+            currentFrame = 2
+        else if(hp!! > 0)
+            currentFrame = 1
+        else
+            currentFrame = 0
     }
 
     override fun LateUpdate(dt: Float) {
         super.LateUpdate(dt)
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BLEND, this)
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
     }
 
     override fun Render(): Boolean {

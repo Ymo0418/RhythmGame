@@ -8,6 +8,7 @@ import com.example.rhythmgame.Manager.ComponentManager
 open class GameObject : Base() {
     protected val Components: MutableList<Component> = mutableListOf()
     protected lateinit var TransformCom: Comp_Transform
+    protected var isDead = false
 
     init {
         TransformCom = Add_Component("TransformCom") as Comp_Transform
@@ -19,6 +20,7 @@ open class GameObject : Base() {
             comp.Update(fTimeDelta)
         }
     }
+
     override fun LateUpdate(fTimeDelta: Float) {
         for (comp in Components) {
             comp.LateUpdate(fTimeDelta)
@@ -33,5 +35,13 @@ open class GameObject : Base() {
         }
 
         return comp
+    }
+
+    public fun GetTransformComp(): Comp_Transform {
+        return TransformCom
+    }
+
+    public fun IsDead(): Boolean {
+        return isDead
     }
 }

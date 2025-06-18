@@ -1,7 +1,7 @@
 package com.example.rhythmgame.Component
 
 import android.opengl.Matrix
-import android.util.Log
+import kotlin.math.sqrt
 
 class Comp_Transform : Component() {
     var position = floatArrayOf(0f, 0f, 0f)
@@ -31,5 +31,11 @@ class Comp_Transform : Component() {
         newComponent.scale = this.scale.copyOf()
         System.arraycopy(this.SRP, 0, newComponent.SRP, 0, this.SRP.size)
         return newComponent
+    }
+
+    public fun Distance2D(other: Comp_Transform): Float {
+        val dx = position[0] - other.position[0]
+        val dy = position[1] - other.position[1]
+        return sqrt(dx * dx + dy * dy)
     }
 }

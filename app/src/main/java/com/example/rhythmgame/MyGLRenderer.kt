@@ -15,13 +15,15 @@ import com.example.rhythmgame.Manager.ComponentManager
 import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.SoundManager
+import com.example.rhythmgame.Manager.SpawnManager
 import com.example.rhythmgame.Manager.UIManager
 import com.example.rhythmgame.Manager.UIManager.joystick
 import com.example.rhythmgame.Object.Camera
 import com.example.rhythmgame.Object.JustRenderObject
 import com.example.rhythmgame.Object.Player
 import com.example.rhythmgame.Object.Joystick
-import com.example.rhythmgame.Object.Monster
+import com.example.rhythmgame.Object.Monster.Rat
+import com.example.rhythmgame.Object.Monster.Skill
 import com.example.rhythmgame.Object.UI.HP
 import com.example.rhythmgame.Object.UI.UIObject
 import com.example.rhythmgame.Object.UI.XButton
@@ -55,7 +57,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         if (UIManager.isGameOver) {
             // 검은색 클리어만 하고 리턴
-            GLES20.glClearColor(0f, 0f, 0f, 1f)
+            GLES20.glClearColor(0f, 0f, 0f, 0f)
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             return
         }
@@ -64,6 +66,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         SoundManager.Update(0.016f)
         CollisionManager.ResetCollideInfo() //이전프레임 충돌정보 초기화
+        SpawnManager.Update(0.016f)
         ObjectManager.Update(0.016f)
         CollisionManager.Update(0.016f)
 
@@ -92,6 +95,9 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("ShaderCom_UI", Comp_Shader(context.getString(R.string.VS_UI)
                                                                         , context.getString(R.string.FS_UI)))
 
+        ComponentManager.Register_Component("TextureCom_Thunder", Comp_Texture(context, R.drawable.thunder_splash))
+        ComponentManager.Register_Component("TextureCom_Rat_Idle", Comp_Texture(context, R.drawable.rat_idle))
+        ComponentManager.Register_Component("TextureCom_Rat_Run", Comp_Texture(context, R.drawable.rat_run))
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.player_idle))
         ComponentManager.Register_Component("TextureCom_Player_Walk", Comp_Texture(context, R.drawable.player_walk))
         ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field))
@@ -101,7 +107,6 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("Texture_xButton", Comp_Texture(context, R.drawable.x_button))
         ComponentManager.Register_Component("Texture_yButton", Comp_Texture(context, R.drawable.y_button))
         ComponentManager.Register_Component("Texture_HP", Comp_Texture(context, R.drawable.hp_img))
-
     }
 
     private fun Ready_UI() {
@@ -135,9 +140,11 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
     }
 
     private fun Ready_Level() {
+
         ObjectManager.Add_Object(ObjectManager.LayerType.CAMERA, Camera)
-        ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Player())
-        ObjectManager.Add_Object(ObjectManager.LayerType.MONSTER, Monster())
+        val Player = Player()
+        ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Player)
+        ObjectManager.Add_Object(ObjectManager.LayerType.MONSTER, Rat(Player.GetTransformComp()))
         ObjectManager.Add_Object(ObjectManager.LayerType.BACKGROUND, JustRenderObject("TextureCom_Field",
             floatArrayOf(5f,5f,5f), floatArrayOf(0f,0f,0f), floatArrayOf(0f,0f,0f), RenderManager.RenderGroup.NONBLEND))
     }
