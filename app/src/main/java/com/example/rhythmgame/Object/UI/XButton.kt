@@ -52,17 +52,22 @@ class XButton(private val context: Context): UIObject() {
         TransformCom.scale[0] = 0.07f
         TransformCom.scale[1] = 0.14f
     }
+
     override fun Update(fTimeDelta: Float) {
         TransformCom.position[0] = 0.875f
         TransformCom.position[1] = -0.725f
+
         super.Update(fTimeDelta)
     }
+
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BLEND, this)
 
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
     }
     override fun Render(): Boolean {
+        super.Render()
+
         shader.Use_Program()
         val worldLoc    = shader.Get_UniformAttribute("u_worldMatrix")
         val aPos = shader.Get_Attribute("a_Position")

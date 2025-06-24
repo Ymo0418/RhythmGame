@@ -1,6 +1,7 @@
 package com.example.rhythmgame.Object
 
 import android.opengl.Matrix
+import android.util.Log
 import com.example.rhythmgame.Base.GameObject
 import com.example.rhythmgame.Manager.ObjectManager
 
@@ -18,7 +19,6 @@ object Camera : GameObject() {
     }
 
     override fun Update(fTimeDelta: Float) {
-
         val PlayerTrans = ObjectManager.Get_Objects(ObjectManager.LayerType.PLAYER).first().GetTransformComp()
         if(TransformCom.Distance2D(PlayerTrans)
             > 0.5f)
@@ -38,13 +38,14 @@ object Camera : GameObject() {
     }
 
     override fun LateUpdate(fTimeDelta: Float) {
-        super.LateUpdate(fTimeDelta)
-
         Matrix.invertM(View, 0, TransformCom.SRP, 0);
         Matrix.setIdentityM(Proj, 0)
         Matrix.perspectiveM(Proj, 0, fovy, aspect, near, far)
 
         Matrix.multiplyMM(ViewProj, 0, Proj, 0, View, 0)
+
+        super.LateUpdate(fTimeDelta)
+        TransformCom.BuildMatrix()
     }
 
     public fun Get_ViewProj(): FloatArray {

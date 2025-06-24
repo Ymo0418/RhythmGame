@@ -10,6 +10,7 @@ import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.CollisionManager
 import com.example.rhythmgame.Manager.RenderManager
+import com.example.rhythmgame.Manager.SoundManager
 import com.example.rhythmgame.Object.Camera
 
 class Skill(target: Comp_Transform): GameObject() {
@@ -17,43 +18,59 @@ class Skill(target: Comp_Transform): GameObject() {
     protected lateinit var ShaderCom: Comp_Shader
     protected lateinit var ColliderCom: Comp_Collider
     protected lateinit var TextureCom: Comp_Texture
-    protected var duration = 0.1f
+    protected var duration = 0f
+    protected var curDuration = 0f
     private var currentFrame = 0
-    private var spriteSize = 14f
+    private var spriteSize = 16f
+    private var bDone = false
 
     init {
+        duration = 0.4f
         TransformCom.position = target.position.copyOf()
+        TransformCom.scale = floatArrayOf(0.5f, 0.5f, 1f)
         BufferCom = Add_Component("VIBufferCom") as Comp_VIBuffer
         ShaderCom = Add_Component("ShaderCom_Anim") as Comp_Shader
         ColliderCom = Add_Component("ColliderCom") as Comp_Collider
-        TextureCom = Add_Component("TextureCom_Thunder") as Comp_Texture
+        TextureCom = Add_Component("TextureCom_Holy") as Comp_Texture
 
-        CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.SKILL, ColliderCom)
-        ColliderCom.SetColliderInfo(TransformCom, 1, 0.5f, 0.3f)
+        ColliderCom.SetColliderInfo(TransformCom, 1, 1, 0.5f, 0.3f)
 
         Components.add(BufferCom)
         Components.add(ShaderCom)
         Components.add(ColliderCom)
         Components.add(TextureCom)
+
+        SoundManager.PlaySFX("Holy", 1f)
     }
 
     override fun Update(fTimeDelta: Float) {
-        super.Update(fTimeDelta)
 
-        duration += fTimeDelta
+        currentFrame = (spriteSize * curDuration / duration).toInt() - 1
 
-        currentFrame = (spriteSize * duration).toInt()
-
-        if(duration >= 1f)
+        if(curDuration >= duration)
             isDead = true
+
+        curDuration += fTimeDelta
+
+        super.Update(fTimeDelta)
     }
 
     override fun LateUpdate(fTimeDelta: Float) {
+        if(ColliderCom.isCollide) {
+            bDone = true
+        }
+
+        if(!bDone)
+            CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.SKILL, ColliderCom)
+
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.NONBLEND, this)
+
         super.LateUpdate(fTimeDelta)
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BLEND, this)
     }
 
     override fun Render(): Boolean {
+        super.Render()
+
         ShaderCom.Use_Program()
 
         val posLoc      = ShaderCom.Get_Attribute("a_Position")

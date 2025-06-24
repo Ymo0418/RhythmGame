@@ -35,12 +35,13 @@ class JustRenderObject(tex: String, scale: FloatArray, rot: FloatArray, pos: Flo
     }
 
     override fun LateUpdate(fTimeDelta: Float) {
-        super.LateUpdate(fTimeDelta)
-
         RenderManager.Add_RenderObject(rg, this)
+        super.LateUpdate(fTimeDelta)
     }
 
     override fun Render(): Boolean {
+        super.Render()
+
         ShaderCom.Use_Program()
 
         val posLoc      = ShaderCom.Get_Attribute("a_Position")

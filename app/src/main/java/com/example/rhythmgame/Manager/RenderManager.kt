@@ -41,7 +41,7 @@ object RenderManager : Base() {
     }
 
     private fun Render_UI(): Boolean {
-        GLES20.glDisable(GLES20.GL_BLEND)
+        GLES20.glEnable(GLES20.GL_BLEND)
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
         RenderObjects[RenderGroup.UI]?.forEach {
             if(!it.Render())

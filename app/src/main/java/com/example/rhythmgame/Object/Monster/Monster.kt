@@ -36,7 +36,6 @@ abstract class Monster(playerTrans: Comp_Transform): RhythmObject() {
         BufferCom = Add_Component("VIBufferCom") as Comp_VIBuffer
         ShaderCom = Add_Component("ShaderCom_Anim") as Comp_Shader
         ColliderCom = Add_Component("ColliderCom") as Comp_Collider
-        CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.MONSTER, ColliderCom)
 
         Components.add(BufferCom)
         Components.add(ShaderCom)
@@ -54,9 +53,11 @@ abstract class Monster(playerTrans: Comp_Transform): RhythmObject() {
         val dx = (playerPos[0] - TransformCom.position[0])
         val dy = (playerPos[1] - TransformCom.position[1])
         val len = sqrt(dx * dx + dy * dy)
-        require(len != 0f)
 
-        direction = floatArrayOf(dx / len, dy / len)
+        if(len == 0f)
+            direction = floatArrayOf(0f, 0f)
+        else
+            direction = floatArrayOf(dx / len, dy / len)
     }
 
     override fun LateUpdate(fTimeDelta: Float) {
@@ -66,6 +67,8 @@ abstract class Monster(playerTrans: Comp_Transform): RhythmObject() {
     }
 
     override fun Render(): Boolean {
+        super.Render()
+
         ShaderCom.Use_Program()
 
         val posLoc      = ShaderCom.Get_Attribute("a_Position")

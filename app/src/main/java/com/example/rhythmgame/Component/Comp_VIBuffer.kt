@@ -14,9 +14,9 @@ class Comp_VIBuffer : Component() {
     )
     private val texCoordData = floatArrayOf(
         0f, 0f,
-        0f, 1f,
+        0f, 0.9999f,
         1f, 0f,
-        1f, 1f
+        1f, 0.9999f
     )
     public lateinit var vertexBuffer: FloatBuffer
     public lateinit var texCoordBuffer: FloatBuffer

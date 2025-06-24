@@ -10,12 +10,14 @@ import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Object.UI.UIObject
 import kotlin.math.sqrt
 import android.util.Log
+import com.example.rhythmgame.Component.Comp_Transform
 
 class Joystick : UIObject() {
     private val texCom     = Add_Component("TextureCom_Joystick")   as Comp_Texture
     private val texCom2    = Add_Component("TextureCom_Joystick2")  as Comp_Texture
     private val vibuffer   = Add_Component("VIBufferCom")           as Comp_VIBuffer
     private val shader     = Add_Component("ShaderCom_UI")          as Comp_Shader
+    private val handleTrns = Add_Component("TransformCom")          as Comp_Transform
 
     // 뷰 크기 (onSurfaceChanged 에서 세팅)
     private var viewWidth = 0
@@ -44,10 +46,13 @@ class Joystick : UIObject() {
     private val handleScaleY = 0.14f
 
     init {
-        Components.addAll(listOf(vibuffer, shader, texCom, texCom2))
+        Components.addAll(listOf(vibuffer, shader, texCom, texCom2, handleTrns))
         // 첫번째 텍스처(베이스)의 스케일
         TransformCom.scale[0] = 0.1f
         TransformCom.scale[1] = 0.2f
+
+        handleTrns.scale[0] = handleScaleX
+        handleTrns.scale[1] = handleScaleY
     }
 
     fun onSurfaceSizeChanged(width: Int, height: Int) {
@@ -55,13 +60,31 @@ class Joystick : UIObject() {
         viewHeight = height
     }
 
-    private fun pixelToNdcX(px: Float): Float = px / viewWidth * 2f - 1f
-    private fun pixelToNdcY(py: Float): Float = 1f - (py / viewHeight * 2f)
+    private fun pixelToNdcX(px: Float): Float {
+      if(viewWidth == 0)
+          return 0f
+        else
+            return (px / viewWidth * 2f - 1f)
+    }
+    private fun pixelToNdcY(py: Float): Float {
+        if(viewHeight == 0)
+            return 0f
+        else
+            return 1f - (py / viewHeight * 2f)
+    }
 
     override fun Update(fTimeDelta: Float) {
+        CalcMovement(fTimeDelta)
+        UpdateBase(fTimeDelta)
+        UpdateHandle(fTimeDelta)
+
+        super.Update(fTimeDelta)
+    }
+
+    private fun CalcMovement(fTimeDelta: Float) {
         // 이동량 계산
         val dx = curX - baseX
-        val dy = baseY - curY
+        val dy = baseY - curY   //좌표계가 반대라 이렇게 해둠
         val dist = sqrt(dx*dx + dy*dy)
         if (dist > 0f) {
             val dirX = dx / dist
@@ -75,39 +98,16 @@ class Joystick : UIObject() {
         }
     }
 
-    override fun LateUpdate(fTimeDelta: Float) {
-        super.LateUpdate(fTimeDelta)
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BLEND, this)
-    }
-
-    override fun Render(): Boolean {
-        shader.Use_Program()
-        val worldLoc   = shader.Get_UniformAttribute("u_worldMatrix")
-        val aPos       = shader.Get_Attribute("a_Position")
-        val aTex       = shader.Get_Attribute("a_TexCoord")
-        val texSampler = shader.Get_UniformAttribute("u_Texture")
-        val alphaLoc   = shader.Get_UniformAttribute("u_Alpha")
-
-        // 1) 베이스 이미지 그리기
+    private fun UpdateBase(fTimeDelta: Float) {
+        // 베이스 이미지 위치
         val ndcBaseX = pixelToNdcX(baseX)
         val ndcBaseY = pixelToNdcY(baseY)
         TransformCom.position[0] = ndcBaseX
         TransformCom.position[1] = ndcBaseY
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom.textureID[0])
-        GLES20.glUniform1i(texSampler, 0)
-        GLES20.glUniform1f(alphaLoc, if (isActive) 1f else 0.8f)
-        GLES20.glUniformMatrix4fv(worldLoc, 1, false, TransformCom.SRP, 0)
-        vibuffer.vertexBuffer.position(0)
-        GLES20.glEnableVertexAttribArray(aPos)
-        GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 0, vibuffer.vertexBuffer)
-        vibuffer.texCoordBuffer.position(0)
-        GLES20.glEnableVertexAttribArray(aTex)
-        GLES20.glVertexAttribPointer(aTex, 2, GLES20.GL_FLOAT, false, 0, vibuffer.texCoordBuffer)
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+    }
 
-        // 2) 핸들 이미지 그리기 (항상 표시, 최대 드래그 제한)
-        // raw 픽셀 좌표
+    private fun UpdateHandle(fTimeDelta: Float) {
+        // 핸들 이미지 위치 (최대 드래그 제한)
         var handlePxX = baseX
         var handlePxY = baseY
         if (isActive) {
@@ -123,18 +123,45 @@ class Joystick : UIObject() {
                 handlePxY = baseY + rawDy * ratio
             }
         }
+
         val ndcHandleX = pixelToNdcX(handlePxX)
         val ndcHandleY = pixelToNdcY(handlePxY)
-        Matrix.setIdentityM(tmpM, 0)
-        Matrix.translateM(tmpM, 0, ndcHandleX, ndcHandleY, 0f)
-        Matrix.scaleM(tmpM, 0, handleScaleX, handleScaleY, 1f)
-        GLES20.glUniformMatrix4fv(worldLoc, 1, false, tmpM, 0)
+        handleTrns.position = floatArrayOf(ndcHandleX, ndcHandleY, 0f)
+    }
+
+    override fun LateUpdate(fTimeDelta: Float) {
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
+
+        super.LateUpdate(fTimeDelta)
+    }
+
+    override fun Render(): Boolean {
+        super.Render()
+        handleTrns.BuildMatrix()
+
+        shader.Use_Program()
+        val worldLoc   = shader.Get_UniformAttribute("u_worldMatrix")
+        val aPos       = shader.Get_Attribute("a_Position")
+        val aTex       = shader.Get_Attribute("a_TexCoord")
+        val texSampler = shader.Get_UniformAttribute("u_Texture")
+        val alphaLoc   = shader.Get_UniformAttribute("u_Alpha")
+
+        GLES20.glEnableVertexAttribArray(aPos)
+        GLES20.glEnableVertexAttribArray(aTex)
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+        GLES20.glUniform1i(texSampler, 0)
+
+        GLES20.glUniformMatrix4fv(worldLoc, 1, false, handleTrns.SRP, 0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom2.textureID[0])
-        val handleAlpha = if (isActive) 1f else 0.7f
-        GLES20.glUniform1f(alphaLoc, handleAlpha)
-        vibuffer.vertexBuffer.position(0)
+        GLES20.glUniform1f(alphaLoc, if (isActive) 1f else 0.7f)
         GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 0, vibuffer.vertexBuffer)
-        vibuffer.texCoordBuffer.position(0)
+        GLES20.glVertexAttribPointer(aTex, 2, GLES20.GL_FLOAT, false, 0, vibuffer.texCoordBuffer)
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
+
+        GLES20.glUniformMatrix4fv(worldLoc, 1, false, TransformCom.SRP, 0)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom.textureID[0])
+        GLES20.glUniform1f(alphaLoc, if (isActive) 1f else 0.8f)
+        GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 0, vibuffer.vertexBuffer)
         GLES20.glVertexAttribPointer(aTex, 2, GLES20.GL_FLOAT, false, 0, vibuffer.texCoordBuffer)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 

@@ -27,6 +27,11 @@ open class GameObject : Base() {
         }
     }
 
+    override fun Render(): Boolean {
+        TransformCom.BuildMatrix()
+        return super.Render()
+    }
+
     protected fun Add_Component(tag: String) : Component {
         val comp = ComponentManager.Clone_Component(tag)
         if(comp == null) {

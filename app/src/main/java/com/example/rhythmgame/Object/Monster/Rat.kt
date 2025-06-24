@@ -2,6 +2,7 @@ package com.example.rhythmgame.Object.Monster
 
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
+import com.example.rhythmgame.Manager.CollisionManager
 
 class Rat(playerTrans: Comp_Transform): Monster(playerTrans) {
     init {
@@ -9,7 +10,7 @@ class Rat(playerTrans: Comp_Transform): Monster(playerTrans) {
         speed = 0.01f
         stateSpriteCounts = intArrayOf(6, 6)
         TransformCom.scale = floatArrayOf(0.4f, 0.4f, 1f)
-        ColliderCom.SetColliderInfo(TransformCom, 1, 0.3f, 0.1f)
+        ColliderCom.SetColliderInfo(TransformCom, 1, 1, 0.3f, 0.1f)
 
         TextureComs = arrayOf(
             Add_Component("TextureCom_Rat_Idle") as Comp_Texture,
@@ -21,8 +22,6 @@ class Rat(playerTrans: Comp_Transform): Monster(playerTrans) {
     }
 
     override fun Update(fTimeDelta: Float) {
-        super.Update(fTimeDelta)
-
         if(direction.isNotEmpty()){
             if(direction[0] > 0f)
                 TransformCom.rotation[1] = 0f
@@ -50,5 +49,25 @@ class Rat(playerTrans: Comp_Transform): Monster(playerTrans) {
                 TransformCom.position[1] += direction[1] * speed
             }
         }
+
+        super.Update(fTimeDelta)
+    }
+
+    override fun LateUpdate(fTimeDelta: Float) {
+        if(ColliderCom.isCollide)
+        {
+            hp -= ColliderCom.collideInfo
+        }
+
+        if(hp <= 0)
+            isDead = true
+
+        CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.MONSTER, ColliderCom)
+
+        super.LateUpdate(fTimeDelta)
+    }
+
+    override fun Render(): Boolean {
+        return super.Render()
     }
 }

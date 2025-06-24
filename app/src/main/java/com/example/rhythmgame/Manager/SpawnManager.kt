@@ -12,6 +12,7 @@ object SpawnManager: Base() {
     private var cooldown = arrayOf(2f, 5f, 10f)
     private var curCooldown = 0f
     private var PlayerTrans: Comp_Transform? = null
+    private var range = arrayOf(1f, 2f)
 
     override fun Update(fTimeDelta: Float) {
 
@@ -23,8 +24,8 @@ object SpawnManager: Base() {
                 PlayerTrans = ObjectManager.Get_Objects(ObjectManager.LayerType.PLAYER).first().GetTransformComp()
             }
 
-            val rx = (if(Random.nextBoolean()) 1f else -1f) * (Random.nextFloat() * 3f + 3f)
-            val ry = (if(Random.nextBoolean()) 1f else -1f) * (Random.nextFloat() * 3f + 3f)
+            val rx = (if(Random.nextBoolean()) 1f else -1f) * (Random.nextFloat() * (range[1] - range[0]) + range[0])
+            val ry = (if(Random.nextBoolean()) 1f else -1f) * (Random.nextFloat() * (range[1] - range[0]) + range[0])
             //val randomMonster = Random.nextInt(0, 3)
             val randomMonster = 0
 

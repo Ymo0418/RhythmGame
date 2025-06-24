@@ -15,7 +15,7 @@ class Comp_Collider(): Component() {
     init {
     }
 
-    public fun SetColliderInfo(parentTransform: Comp_Transform, pushRatio: Int, width:Float, height:Float,
+    public fun SetColliderInfo(parentTransform: Comp_Transform, pushRatio: Int, colValue: Int, width:Float, height:Float,
                                offsetX:Float = 0f, offsetY : Float = 0f) {
         parentPos = parentTransform.position
         left = offsetX - width / 2f
@@ -23,6 +23,7 @@ class Comp_Collider(): Component() {
         top = offsetY + height / 2f
         bottom = offsetY - height / 2f
         this.pushRatio = pushRatio
+        value = colValue
     }
 
     override fun Update(fTimeDelta: Float) {
@@ -31,6 +32,8 @@ class Comp_Collider(): Component() {
 
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
+        isCollide = false
+        collideInfo = 0
     }
 
     override fun Render(): Boolean {
@@ -39,5 +42,10 @@ class Comp_Collider(): Component() {
 
     override fun Clone(): Component {
         return Comp_Collider()
+    }
+
+    private fun ResetCollideInfo() {
+        isCollide = false
+        collideInfo = 0
     }
 }

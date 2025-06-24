@@ -3,7 +3,6 @@ package com.example.rhythmgame
 import android.content.Context
 import android.opengl.GLSurfaceView
 import android.opengl.GLES20
-import android.util.Log
 import android.view.MotionEvent
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
@@ -24,7 +23,7 @@ import com.example.rhythmgame.Object.Player
 import com.example.rhythmgame.Object.Joystick
 import com.example.rhythmgame.Object.Monster.Rat
 import com.example.rhythmgame.Object.Monster.Skill
-import com.example.rhythmgame.Object.UI.HP
+import com.example.rhythmgame.Object.UI.HPBar
 import com.example.rhythmgame.Object.UI.UIObject
 import com.example.rhythmgame.Object.UI.XButton
 import com.example.rhythmgame.Object.UI.YButton
@@ -42,6 +41,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         SoundManager.Init(context)
         SoundManager.PlayBGM(context, R.raw.stage_1)
+
+        SoundManager.LoadSE(context, "Holy", R.raw.holy)
     }
 
     //GLSurfaceView의 크기가 변경되거나 화면 방향이 전환될 때 호출
@@ -65,21 +66,18 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
         SoundManager.Update(0.016f)
-        CollisionManager.ResetCollideInfo() //이전프레임 충돌정보 초기화
+        UIManager.CheckTouch()
         SpawnManager.Update(0.016f)
-        ObjectManager.Update(0.016f)
-        CollisionManager.Update(0.016f)
 
+        CollisionManager.Update(0.016f)
+        ObjectManager.Update(0.016f)
         ObjectManager.LateUpdate(0.016f)
+        CollisionManager.LateUpdate(0.016f)
         RenderManager.Render()
     }
 
     public fun OnTouchEvent(event: MotionEvent?) {
-        val UIObjects = ObjectManager.Get_Objects(ObjectManager.LayerType.UI)
-        for (ui in UIObjects) {
-            if(ui is UIObject)
-                ui.OnTouch(event)
-        }
+        UIManager.TouchEvent(event)
     }
 
     private fun Ready_Components() {
@@ -95,7 +93,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("ShaderCom_UI", Comp_Shader(context.getString(R.string.VS_UI)
                                                                         , context.getString(R.string.FS_UI)))
 
-        ComponentManager.Register_Component("TextureCom_Thunder", Comp_Texture(context, R.drawable.thunder_splash))
+        ComponentManager.Register_Component("TextureCom_Slash", Comp_Texture(context, R.drawable.slashskill))
+        ComponentManager.Register_Component("TextureCom_Holy", Comp_Texture(context, R.drawable.holyskill))
         ComponentManager.Register_Component("TextureCom_Rat_Idle", Comp_Texture(context, R.drawable.rat_idle))
         ComponentManager.Register_Component("TextureCom_Rat_Run", Comp_Texture(context, R.drawable.rat_run))
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.player_idle))
@@ -116,11 +115,6 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, joystick)
         UIManager.SetJoystick(joystick)
 
-        val joystick2 = Joystick()
-        ObjectManager.Add_Object(ObjectManager.LayerType.UI, joystick2)
-        UIManager.SetJoystick2(joystick2)
-
-
         //객체 만들고
         val xButton = XButton(context)
         //오브젝트매니저에 넣고
@@ -132,20 +126,18 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, yButton)
         UIManager.SetXButton(yButton)
 
-        val hp = HP()
-        //오브젝트매니저에 넣고
+        val hp = HPBar()
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, hp)
-        //다른 오브젝트가 이 UI의 값을 사용할수있도록 매니저에 등록
-        UIManager.SetHP(hp)
+        UIManager.SetHPBar(hp)
     }
 
     private fun Ready_Level() {
-
         ObjectManager.Add_Object(ObjectManager.LayerType.CAMERA, Camera)
         val Player = Player()
         ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Player)
         ObjectManager.Add_Object(ObjectManager.LayerType.MONSTER, Rat(Player.GetTransformComp()))
         ObjectManager.Add_Object(ObjectManager.LayerType.BACKGROUND, JustRenderObject("TextureCom_Field",
             floatArrayOf(5f,5f,5f), floatArrayOf(0f,0f,0f), floatArrayOf(0f,0f,0f), RenderManager.RenderGroup.NONBLEND))
+
     }
 }

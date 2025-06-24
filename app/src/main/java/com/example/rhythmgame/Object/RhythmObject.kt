@@ -9,4 +9,8 @@ abstract class RhythmObject: GameObject() {
     override fun Update(fTimeDelta: Float) {
         beatRatio = SoundManager.GetBeatRatio()
     }
+
+    override fun Render(): Boolean {
+        return super.Render()
+    }
 }

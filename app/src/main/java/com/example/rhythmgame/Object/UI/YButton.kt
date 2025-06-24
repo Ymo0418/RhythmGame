@@ -9,8 +9,12 @@ import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
+import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Manager.RenderManager
+import com.example.rhythmgame.Manager.SoundManager
 import com.example.rhythmgame.Manager.UIManager
+import com.example.rhythmgame.Object.Monster.Skill
+import kotlin.random.Random
 
 //UIObject 상속받기
 class YButton(private val context: Context): UIObject() {
@@ -53,21 +57,25 @@ class YButton(private val context: Context): UIObject() {
     override fun Update(fTimeDelta: Float) {
         TransformCom.position[0] = 0.675f
         TransformCom.position[1] = -0.725f
+
         super.Update(fTimeDelta)
     }
+
     override fun LateUpdate(fTimeDelta: Float) {
         super.LateUpdate(fTimeDelta)
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BLEND, this)
 
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
     }
+
     override fun Render(): Boolean {
+        super.Render()
+
         shader.Use_Program()
         val worldLoc    = shader.Get_UniformAttribute("u_worldMatrix")
         val aPos = shader.Get_Attribute("a_Position")
         val aTex = shader.Get_Attribute("a_TexCoord")
         val texSampler = shader.Get_UniformAttribute("u_Texture")
         val alphaLoc   = shader.Get_UniformAttribute("u_Alpha")
-
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texCom.textureID[0])
@@ -98,15 +106,18 @@ class YButton(private val context: Context): UIObject() {
                 // Down 시 영역 안이면 눌림 상태로
                 if (event.x in touchLeftPx..touchRightPx && event.y in touchTopPx..touchBottomPx) {
                     isPressed = true
-                    Log.e("YButton", "버튼 누름 시작")
-                    UIManager.hp?.increaseFrame()
 
+                    if(SoundManager.GetBeatValid())
+                    {
+                        //val Skill = Skill(Monsters[random].GetTransformComp())
+                        //ObjectManager.Add_Object(ObjectManager.LayerType.SKILL, Skill)
+
+                    }
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 if (isPressed) {
                     isPressed = false
-                    Log.e("YButton", "버튼 해제")
                 }
             }
         }

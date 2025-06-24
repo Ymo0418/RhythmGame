@@ -2,12 +2,10 @@ package com.example.rhythmgame.Object
 
 import android.opengl.GLES20
 import android.util.Log
-import com.example.rhythmgame.Base.GameObject
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Component.Comp_Collider
-import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Manager.CollisionManager
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.SoundManager
@@ -17,7 +15,10 @@ class Player: RhythmObject() {
     public var currentFrame = 3
     var bFlip = false
     var bMove = false
-    public var hp = 500
+    public var hp = 4
+    var fInvincible = 0f
+    var fFlicker = 0f
+    var bInvisible = false
 
     private lateinit var IdleTextureCom: Comp_Texture
     private lateinit var WalkTextureCom: Comp_Texture
@@ -26,13 +27,13 @@ class Player: RhythmObject() {
     private lateinit var ColliderCom: Comp_Collider
 
     init {
-        TransformCom.scale[2] = 0.93f
+        TransformCom.scale = floatArrayOf(1.12f, 0.84f, 1f)
         IdleTextureCom = Add_Component("TextureCom_Player_Idle") as Comp_Texture
         WalkTextureCom = Add_Component("TextureCom_Player_Walk") as Comp_Texture
         BufferCom = Add_Component("VIBufferCom") as Comp_VIBuffer
         ShaderCom = Add_Component("ShaderCom_Anim") as Comp_Shader
         ColliderCom = Add_Component("ColliderCom") as Comp_Collider
-        ColliderCom.SetColliderInfo(TransformCom, 1, 0.6f, 0.8f, 0f, 0.1f)
+        ColliderCom.SetColliderInfo(TransformCom, 1, 0, 0.6f, 0.8f, 0f, 0.1f)
         CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.PLAYER, ColliderCom)
 
         Components.add(IdleTextureCom)
@@ -43,11 +44,7 @@ class Player: RhythmObject() {
     }
 
     override fun Update(fTimeDelta: Float) {
-        super.Update(fTimeDelta)
-
-
-
-        val joystickMove = UIManager.GetMovement()
+        val joystickMove = UIManager.GetJoystickMovement()
 
         TransformCom.position[0] += joystickMove.x
         TransformCom.position[1] += joystickMove.y
@@ -66,20 +63,43 @@ class Player: RhythmObject() {
         }
 
         currentFrame = (beatRatio * if(bMove) 8f else 7f).toInt()
+
+        super.Update(fTimeDelta)
     }
 
-
     override fun LateUpdate(fTimeDelta: Float) {
-        super.LateUpdate(fTimeDelta)
+        if(fInvincible <= 0f) {
 
-        if(ColliderCom.isCollide)
-        {
-            hp -= ColliderCom.collideInfo
+            if(ColliderCom.isCollide) {
+                hp -= ColliderCom.collideInfo
+                fInvincible = 2f
+                fFlicker = 0f
+                bInvisible = true
+            }
+
+            RenderManager.Add_RenderObject(RenderManager.RenderGroup.NONBLEND, this)
         }
-        RenderManager.Add_RenderObject(RenderManager.RenderGroup.NONBLEND, this)
+        else {
+            fInvincible -= fTimeDelta
+            fFlicker += fTimeDelta
+
+            if(fFlicker > 0.032f) {
+                fFlicker = 0f
+                bInvisible = !bInvisible
+            }
+
+            if(bInvisible) {
+                RenderManager.Add_RenderObject(RenderManager.RenderGroup.NONBLEND, this)
+            }
+
+        }
+
+        super.LateUpdate(fTimeDelta)
     }
 
     override fun Render(): Boolean {
+        super.Render()
+
         ShaderCom.Use_Program()
 
         val posLoc      = ShaderCom.Get_Attribute("a_Position")

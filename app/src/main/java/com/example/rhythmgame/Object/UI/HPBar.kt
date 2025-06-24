@@ -1,7 +1,7 @@
 package com.example.rhythmgame.Object.UI
 
-import android.content.Context
 import android.opengl.GLES20
+import android.util.Log
 import android.view.MotionEvent
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
@@ -11,7 +11,7 @@ import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.UIManager
 import com.example.rhythmgame.Object.Player
 
-class HP: UIObject() {
+class HPBar: UIObject() {
     private val texCom    = Add_Component("Texture_HP") as Comp_Texture
     private val vibuffer  = Add_Component("VIBufferCom")        as Comp_VIBuffer
     private val shader    = Add_Component("ShaderCom_UI")       as Comp_Shader
@@ -55,29 +55,21 @@ class HP: UIObject() {
     }
 
     override fun Update(fTimeDelta: Float) {
-        super.Update(fTimeDelta)
-
         val player = ObjectManager.Get_Objects(ObjectManager.LayerType.PLAYER).first() as Player
-        hp = player.hp
+        currentFrame = player.hp
 
-        if(hp!! > 499)
-            currentFrame = 4
-        else if(hp!! > 250)
-            currentFrame = 3
-        else if(hp!! > 100)
-            currentFrame = 2
-        else if(hp!! > 0)
-            currentFrame = 1
-        else
-            currentFrame = 0
+        super.Update(fTimeDelta)
     }
 
     override fun LateUpdate(dt: Float) {
-        super.LateUpdate(dt)
         RenderManager.Add_RenderObject(RenderManager.RenderGroup.UI, this)
+
+        super.LateUpdate(dt)
     }
 
     override fun Render(): Boolean {
+        super.Render()
+
         shader.Use_Program()
         val uWorld   = shader.Get_UniformAttribute("u_worldMatrix")
         val aPos     = shader.Get_Attribute("a_Position")

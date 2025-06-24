@@ -29,19 +29,26 @@ object CollisionManager: Base() {
     }
 
     override fun Update(fTimeDelta: Float) {
-        IntersectGroup(ColliderGroup.MONSTER, ColliderGroup.PLAYER)
-        IntersectGroupTrigger(ColliderGroup.MONSTER, ColliderGroup.SKILL)
+        ClearColliders()
     }
 
     override fun LateUpdate(fTimeDelta: Float) {
+        IntersectGroup(ColliderGroup.MONSTER, ColliderGroup.PLAYER)
+        IntersectGroupTrigger(ColliderGroup.MONSTER, ColliderGroup.SKILL)
     }
 
     public fun RegisterCollider(group: ColliderGroup, collider: Comp_Collider) {
         Colliders[group]?.add(collider)
     }
 
-    public fun ClearGroup() {
+    private fun ClearColliders() {
+        for(group in Colliders) {
+            group.value.clear()
+        }
+    }
 
+    private fun ClearGroup(group: ColliderGroup) {
+        Colliders[group]?.clear()
     }
 
     private fun IntersectGroupTrigger(a: ColliderGroup, b: ColliderGroup) {
@@ -101,8 +108,8 @@ object CollisionManager: Base() {
 
         a.isCollide = true
         b.isCollide = true
-        a.collideInfo = 1
-        b.collideInfo = 1
+        a.collideInfo = b.value
+        b.collideInfo = a.value
 
         return true
     }
