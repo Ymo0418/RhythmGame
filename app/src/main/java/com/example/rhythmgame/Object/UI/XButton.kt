@@ -1,19 +1,15 @@
 package com.example.rhythmgame.Object.UI
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.opengl.GLES20
-import android.util.Log
 import android.view.MotionEvent
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
-import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.SoundManager
-import com.example.rhythmgame.Manager.UIManager
-import com.example.rhythmgame.Object.Monster.Skill
+import com.example.rhythmgame.Object.Skill.Skill_Holy
 import kotlin.random.Random
 
 //UIObject 상속받기
@@ -113,7 +109,7 @@ class XButton(private val context: Context): UIObject() {
                         if(Monsters.isNotEmpty()) {
                             val random = Random.nextInt(0, Monsters.size)
 
-                            val Skill = Skill(Monsters[random].GetTransformComp())
+                            val Skill = Skill_Holy(Monsters[random].GetTransformComp())
                             ObjectManager.Add_Object(ObjectManager.LayerType.SKILL, Skill)
                         }
                     }

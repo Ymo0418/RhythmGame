@@ -5,14 +5,14 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
-class Comp_VIBuffer : Component() {
-    private val vertexData = floatArrayOf(
+open class Comp_VIBuffer : Component() {
+    protected val vertexData = floatArrayOf(
         -1f, 1f, 0f,
         -1f, -1f, 0f,
         1f, 1f, 0f,
         1f, -1f, 0f
     )
-    private val texCoordData = floatArrayOf(
+    protected val texCoordData = floatArrayOf(
         0f, 0f,
         0f, 0.9999f,
         1f, 0f,

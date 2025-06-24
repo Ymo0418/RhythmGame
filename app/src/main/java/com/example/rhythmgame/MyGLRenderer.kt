@@ -9,6 +9,7 @@ import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_Collider
 import com.example.rhythmgame.Component.Comp_VIBuffer
+import com.example.rhythmgame.Component.Comp_VIBufferUpper
 import com.example.rhythmgame.Manager.CollisionManager
 import com.example.rhythmgame.Manager.ComponentManager
 import com.example.rhythmgame.Manager.ObjectManager
@@ -18,14 +19,12 @@ import com.example.rhythmgame.Manager.SpawnManager
 import com.example.rhythmgame.Manager.UIManager
 import com.example.rhythmgame.Manager.UIManager.joystick
 import com.example.rhythmgame.Object.Camera
-import com.example.rhythmgame.Object.JustRenderObject
+import com.example.rhythmgame.Object.Background
 import com.example.rhythmgame.Object.Player
 import com.example.rhythmgame.Object.Joystick
 import com.example.rhythmgame.Object.Monster.Rat
-import com.example.rhythmgame.Object.Monster.Skill
 import com.example.rhythmgame.Object.UI.BeatNote
 import com.example.rhythmgame.Object.UI.HPBar
-import com.example.rhythmgame.Object.UI.UIObject
 import com.example.rhythmgame.Object.UI.XButton
 import com.example.rhythmgame.Object.UI.YButton
 
@@ -42,8 +41,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         SoundManager.Init(context)
         SoundManager.PlayBGM(context, R.raw.stage_1)
-
         SoundManager.LoadSE(context, "Holy", R.raw.holy)
+        SoundManager.LoadSE(context, "Slash", R.raw.slash)
     }
 
     //GLSurfaceView의 크기가 변경되거나 화면 방향이 전환될 때 호출
@@ -86,6 +85,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("ColliderCom", Comp_Collider())
 
         ComponentManager.Register_Component("VIBufferCom", Comp_VIBuffer())
+        ComponentManager.Register_Component("VIBufferUpperCom", Comp_VIBufferUpper())
 
         ComponentManager.Register_Component("ShaderCom_Plane", Comp_Shader(context.getString(R.string.VS_VtxPosTex)
                                                                         , context.getString(R.string.FS_VtxPosTex)))
@@ -98,6 +98,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("TextureCom_Holy", Comp_Texture(context, R.drawable.holyskill))
         ComponentManager.Register_Component("TextureCom_Rat_Idle", Comp_Texture(context, R.drawable.rat_idle))
         ComponentManager.Register_Component("TextureCom_Rat_Run", Comp_Texture(context, R.drawable.rat_run))
+        ComponentManager.Register_Component("TextureCom_Mino_Idle", Comp_Texture(context, R.drawable.minotaur_idle))
+        ComponentManager.Register_Component("TextureCom_Mino_Run", Comp_Texture(context, R.drawable.minotaur_run))
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.player_idle))
         ComponentManager.Register_Component("TextureCom_Player_Walk", Comp_Texture(context, R.drawable.player_walk))
         ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field2))
@@ -127,7 +129,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         val yButton = YButton(context)
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, yButton)
-        UIManager.SetXButton(yButton)
+        UIManager.SetYButton(yButton)
 
         val hp = HPBar()
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, hp)
@@ -143,8 +145,8 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         val Player = Player()
         ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Player)
         ObjectManager.Add_Object(ObjectManager.LayerType.MONSTER, Rat(Player.GetTransformComp()))
-        ObjectManager.Add_Object(ObjectManager.LayerType.BACKGROUND, JustRenderObject("TextureCom_Field",
-            floatArrayOf(5f,5f,5f), floatArrayOf(0f,0f,0f), floatArrayOf(0f,0f,0f), RenderManager.RenderGroup.NONBLEND))
+        ObjectManager.Add_Object(ObjectManager.LayerType.BACKGROUND, Background("TextureCom_Field",
+            floatArrayOf(15f,15f,1f), floatArrayOf(0f,0f,0f), floatArrayOf(0f,0f,0f)))
 
     }
 }

@@ -8,15 +8,12 @@ import com.example.rhythmgame.Component.Comp_Texture
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.RenderManager
 
-class JustRenderObject(tex: String, scale: FloatArray, rot: FloatArray, pos: FloatArray, rg: RenderManager.RenderGroup) : GameObject() {
-    private lateinit var rg: RenderManager.RenderGroup
-
+class Background(tex: String, scale: FloatArray, rot: FloatArray, pos: FloatArray) : GameObject() {
     private lateinit var BufferCom: Comp_VIBuffer
     private lateinit var ShaderCom: Comp_Shader
     private lateinit var TextureCom: Comp_Texture
 
     init {
-        this.rg = rg
         TransformCom.scale = scale
         TransformCom.rotation = rot
         TransformCom.position = pos
@@ -35,7 +32,8 @@ class JustRenderObject(tex: String, scale: FloatArray, rot: FloatArray, pos: Flo
     }
 
     override fun LateUpdate(fTimeDelta: Float) {
-        RenderManager.Add_RenderObject(rg, this)
+        RenderManager.Add_RenderObject(RenderManager.RenderGroup.BACKGROUND, this)
+
         super.LateUpdate(fTimeDelta)
     }
 

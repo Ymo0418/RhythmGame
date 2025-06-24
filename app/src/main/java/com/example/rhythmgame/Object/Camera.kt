@@ -20,14 +20,15 @@ object Camera : GameObject() {
 
     override fun Update(fTimeDelta: Float) {
         val PlayerTrans = ObjectManager.Get_Objects(ObjectManager.LayerType.PLAYER).first().GetTransformComp()
-        if(TransformCom.Distance2D(PlayerTrans)
-            > 0.5f)
+        if(TransformCom.Distance2D(PlayerTrans) > 0.5f)
         {
             var x = lerp(TransformCom.position[0], PlayerTrans.position[0], 0.05f)
             var y = lerp(TransformCom.position[1], PlayerTrans.position[1], 0.05f)
 
-            TransformCom.position[0] = x
-            TransformCom.position[1] = y
+            if(x <= 9.1f && x >= -9.1f)
+                TransformCom.position[0] = x
+            if(y <= 10.9f && y >= -11.9f)
+                TransformCom.position[1] = y
         }
 
         super.Update(fTimeDelta)

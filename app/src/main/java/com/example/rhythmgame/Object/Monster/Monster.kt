@@ -93,7 +93,7 @@ abstract class Monster(playerTrans: Comp_Transform): RhythmObject() {
         GLES20.glUniformMatrix4fv(vpLoc, 1, false, Camera.Get_ViewProj(), 0)
 
         // 애니메이션 정보 연결
-        val texScale = floatArrayOf(1.0f / 6.0f, 1.0f)
+        val texScale = floatArrayOf(1.0f / stateSpriteCounts[curState], 1.0f)
         val texOffset = floatArrayOf(currentFrame.toFloat(), 0f)
         GLES20.glUniform2fv(scaleLoc, 1, texScale, 0)
         GLES20.glUniform2fv(offsetLoc, 1, texOffset, 0)

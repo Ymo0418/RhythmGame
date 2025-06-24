@@ -6,11 +6,11 @@ import com.example.rhythmgame.Base.GameObject
 
 object RenderManager : Base() {
     public enum class RenderGroup {
-        NONBLEND, BLEND, UI;
+        BACKGROUND, NONBLEND, BLEND, UI;
     }
 
     private val RenderOrder = listOf(
-        RenderGroup.NONBLEND, RenderGroup.BLEND, RenderGroup.UI
+        RenderGroup.BACKGROUND, RenderGroup.NONBLEND, RenderGroup.BLEND, RenderGroup.UI
     )
 
     private val RenderObjects = mutableMapOf<RenderGroup, MutableList<GameObject>>()
@@ -21,8 +21,20 @@ object RenderManager : Base() {
         }
     }
 
+    private fun Render_Background(): Boolean {
+        GLES20.glDisable(GLES20.GL_BLEND)
+        GLES20.glDepthMask(false)
+        RenderObjects[RenderGroup.BACKGROUND]?.forEach {
+            if(!it.Render())
+                return false
+        }
+        GLES20.glDepthMask(true)
+        return true
+    }
+
     private fun Render_NonBlend(): Boolean {
         GLES20.glDisable(GLES20.GL_BLEND)
+        RenderObjects[RenderGroup.NONBLEND]?.sortByDescending { -it.GetTransformComp().position[1] }
         RenderObjects[RenderGroup.NONBLEND]?.forEach {
             if(!it.Render())
                 return false
@@ -32,11 +44,15 @@ object RenderManager : Base() {
 
     private fun Render_Blend(): Boolean {
         GLES20.glEnable(GLES20.GL_BLEND)
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+        RenderObjects[RenderGroup.BLEND]?.sortByDescending { -it.GetTransformComp().position[1] }
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
         RenderObjects[RenderGroup.BLEND]?.forEach {
             if(!it.Render())
                 return false
         }
+        GLES20.glDepthMask(true)
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST)
         return true
     }
 
@@ -57,6 +73,9 @@ object RenderManager : Base() {
     }
 
     override fun Render(): Boolean {
+        if(!Render_Background())
+            return false
+
         if(!Render_NonBlend())
             return false
 

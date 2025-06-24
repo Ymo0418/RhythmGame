@@ -12,7 +12,6 @@ import com.example.rhythmgame.Object.UI.YButton
 object UIManager: Base() {
     var eventQueue = mutableListOf<MotionEvent?>()
     var joystick: Joystick? = null
-    var joystick2: Joystick? = null
     var xbutton: XButton? = null
     var ybutton: YButton? = null
     var hpBar: HPBar? = null
@@ -24,9 +23,8 @@ object UIManager: Base() {
     //다른 오브젝트에게 값을 넘겨주고 싶은 UI를 여기(UI매니저)에 세팅해줘야함
     fun setHPBar(h: HPBar) { hpBar = h }
     fun SetJoystick(ui: Joystick) { joystick = ui }
-    fun SetJoystick2(ui: Joystick) { joystick2 = ui }
     fun SetXButton(ui: XButton) { xbutton = ui }
-    fun SetXButton(ui: YButton) { ybutton = ui }
+    fun SetYButton(ui: YButton) { ybutton = ui }
     fun SetHPBar(ui: HPBar) { hpBar = ui }
     fun SetBeatNote(ui: BeatNote) {
         beatnote = ui

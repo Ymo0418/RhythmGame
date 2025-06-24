@@ -1,20 +1,15 @@
 package com.example.rhythmgame.Object.UI
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.opengl.GLES20
-import android.util.Log
 import android.view.MotionEvent
 import com.example.rhythmgame.Component.Comp_Shader
 import com.example.rhythmgame.Component.Comp_Texture
-import com.example.rhythmgame.Component.Comp_Transform
 import com.example.rhythmgame.Component.Comp_VIBuffer
 import com.example.rhythmgame.Manager.ObjectManager
 import com.example.rhythmgame.Manager.RenderManager
 import com.example.rhythmgame.Manager.SoundManager
-import com.example.rhythmgame.Manager.UIManager
-import com.example.rhythmgame.Object.Monster.Skill
-import kotlin.random.Random
+import com.example.rhythmgame.Object.Skill.Skill_Slash
 
 //UIObject 상속받기
 class YButton(private val context: Context): UIObject() {
@@ -109,8 +104,9 @@ class YButton(private val context: Context): UIObject() {
 
                     if(SoundManager.GetBeatValid())
                     {
-                        //val Skill = Skill(Monsters[random].GetTransformComp())
-                        //ObjectManager.Add_Object(ObjectManager.LayerType.SKILL, Skill)
+                        val playerTrans = ObjectManager.Get_Objects(ObjectManager.LayerType.PLAYER).first().GetTransformComp()
+                        val Skill = Skill_Slash(playerTrans, playerTrans.rotation[1] != 0f)
+                        ObjectManager.Add_Object(ObjectManager.LayerType.SKILL, Skill)
 
                     }
                 }

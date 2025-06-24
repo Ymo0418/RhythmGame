@@ -34,7 +34,6 @@ class Player: RhythmObject() {
         ShaderCom = Add_Component("ShaderCom_Anim") as Comp_Shader
         ColliderCom = Add_Component("ColliderCom") as Comp_Collider
         ColliderCom.SetColliderInfo(TransformCom, 1, 0, 0.6f, 0.8f, 0f, 0.1f)
-        CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.PLAYER, ColliderCom)
 
         Components.add(IdleTextureCom)
         Components.add(WalkTextureCom)
@@ -63,6 +62,8 @@ class Player: RhythmObject() {
         }
 
         currentFrame = (beatRatio * if(bMove) 8f else 7f).toInt()
+
+        CollisionManager.RegisterCollider(CollisionManager.ColliderGroup.PLAYER, ColliderCom)
 
         super.Update(fTimeDelta)
     }

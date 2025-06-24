@@ -7,7 +7,7 @@ import com.example.rhythmgame.Manager.CollisionManager
 class Rat(playerTrans: Comp_Transform): Monster(playerTrans) {
     init {
         moveCount = 3
-        speed = 0.01f
+        speed = 0.015f
         stateSpriteCounts = intArrayOf(6, 6)
         TransformCom.scale = floatArrayOf(0.4f, 0.4f, 1f)
         ColliderCom.SetColliderInfo(TransformCom, 1, 1, 0.3f, 0.1f)
