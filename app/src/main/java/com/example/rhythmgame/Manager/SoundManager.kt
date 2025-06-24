@@ -32,6 +32,12 @@ object SoundManager: Base() {
             .build()
     }
 
+    // 박자 간격 가져오는 함수
+    // 비공개로 가지고 있던 밀리초 단위 간격을 초 단위로 반환
+    fun GetBeatIntervalSec(): Float {
+        return beatInterval_ms / 1000f
+    }
+
     override fun Update(fTimeDelta: Float) {
         var now = System.currentTimeMillis()
         var elapsed = now - startTime

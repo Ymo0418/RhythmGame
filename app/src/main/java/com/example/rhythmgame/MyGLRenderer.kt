@@ -22,8 +22,14 @@ import com.example.rhythmgame.Object.Camera
 import com.example.rhythmgame.Object.JustRenderObject
 import com.example.rhythmgame.Object.Player
 import com.example.rhythmgame.Object.Joystick
+<<<<<<< Updated upstream
 import com.example.rhythmgame.Object.UI.GameOver
 import com.example.rhythmgame.Object.Monster
+=======
+import com.example.rhythmgame.Object.Monster.Rat
+import com.example.rhythmgame.Object.Monster.Skill
+import com.example.rhythmgame.Object.UI.BeatNote
+>>>>>>> Stashed changes
 import com.example.rhythmgame.Object.UI.HP
 import com.example.rhythmgame.Object.UI.UIObject
 import com.example.rhythmgame.Object.UI.XButton
@@ -113,16 +119,20 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
 
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.player_idle))
         ComponentManager.Register_Component("TextureCom_Player_Walk", Comp_Texture(context, R.drawable.player_walk))
-        ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field))
+        ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.map_upsized_3x))
         ComponentManager.Register_Component("TextureCom_Joystick", Comp_Texture(context, R.drawable.joystickmain))
         ComponentManager.Register_Component("TextureCom_Joystick2", Comp_Texture(context, R.drawable.joystick2))
 
         ComponentManager.Register_Component("Texture_xButton", Comp_Texture(context, R.drawable.x_button))
         ComponentManager.Register_Component("Texture_yButton", Comp_Texture(context, R.drawable.y_button))
         ComponentManager.Register_Component("Texture_HP", Comp_Texture(context, R.drawable.hp_img))
+<<<<<<< Updated upstream
         ComponentManager.Register_Component("Texture_GameOver", Comp_Texture(context, R.drawable.gameover_img))
         ComponentManager.Register_Component("Texture_Continue", Comp_Texture(context, R.drawable.continue_img))
         ComponentManager.Register_Component("Texture_Exit_Game", Comp_Texture(context, R.drawable.exit_img))
+=======
+        ComponentManager.Register_Component("Texture_note", Comp_Texture(context, R.drawable.dot_note_sprite_sheet))
+>>>>>>> Stashed changes
     }
 
     fun restartGame() {
@@ -169,6 +179,7 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         //다른 오브젝트가 이 UI의 값을 사용할수있도록 매니저에 등록
         UIManager.SetHP(hp)
 
+<<<<<<< Updated upstream
 
 //        val gameOver = GameOver(context)
 //        ObjectManager.Add_Object(ObjectManager.LayerType.UI, gameOver)
@@ -189,12 +200,22 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
             // 혹은 강제 종료는 System.exit(0)도 가능하나 finish() 권장
         }
 
+=======
+        val beatnote = BeatNote()
+        ObjectManager.Add_Object(ObjectManager.LayerType.UI, beatnote)
+        UIManager.SetBeatNote(beatnote)
+>>>>>>> Stashed changes
     }
 
     private fun Ready_Level() {
         ObjectManager.Add_Object(ObjectManager.LayerType.CAMERA, Camera)
+<<<<<<< Updated upstream
         ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Player())
         ObjectManager.Add_Object(ObjectManager.LayerType.MONSTER, Monster())
+=======
+        val Player = Player()
+        ObjectManager.Add_Object(ObjectManager.LayerType.PLAYER, Player)
+>>>>>>> Stashed changes
         ObjectManager.Add_Object(ObjectManager.LayerType.BACKGROUND, JustRenderObject("TextureCom_Field",
             floatArrayOf(5f,5f,5f), floatArrayOf(0f,0f,0f), floatArrayOf(0f,0f,0f), RenderManager.RenderGroup.NONBLEND))
     }

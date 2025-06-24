@@ -29,6 +29,10 @@ class JustRenderObject(tex: String, scale: FloatArray, rot: FloatArray, pos: Flo
         Components.add(TextureCom)
         Components.add(BufferCom)
         Components.add(ShaderCom)
+
+        TransformCom.scale[0] = 8f
+        TransformCom.scale[1] = 8f
+
     }
 
     override fun Update(fTimeDelta: Float) {

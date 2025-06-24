@@ -3,7 +3,11 @@ package com.example.rhythmgame.Manager
 import android.graphics.Paint.Join
 import com.example.rhythmgame.Base.Base
 import com.example.rhythmgame.Object.Joystick
+<<<<<<< Updated upstream
 import com.example.rhythmgame.Object.UI.GameOver
+=======
+import com.example.rhythmgame.Object.UI.BeatNote
+>>>>>>> Stashed changes
 import com.example.rhythmgame.Object.UI.HP
 import com.example.rhythmgame.Object.UI.XButton
 import com.example.rhythmgame.Object.UI.YButton
@@ -14,11 +18,15 @@ object UIManager: Base() {
     var xbutton: XButton? = null
     var ybutton: YButton? = null
     var hp: HP? = null
+<<<<<<< Updated upstream
     var Gameover: GameOver? = null
 
 //    var Gameover: GameOver? = null
 //    var Continue: GameOver? = null
 //    var ExitGame: GameOver? = null
+=======
+    var beatnote: BeatNote? = null
+>>>>>>> Stashed changes
 
     // Game over 플래그
     var isGameOver = false
@@ -63,6 +71,7 @@ object UIManager: Base() {
         hp = ui
     }
 
+<<<<<<< Updated upstream
     fun SetGameOver(ui: GameOver) {
         Gameover = ui
     }
@@ -84,4 +93,9 @@ object UIManager: Base() {
 //        ExitGame = ui
 //    }
 
+=======
+    fun SetBeatNote(ui: BeatNote) {
+        beatnote = ui
+    }
+>>>>>>> Stashed changes
 }
