@@ -23,6 +23,7 @@ import com.example.rhythmgame.Object.Player
 import com.example.rhythmgame.Object.Joystick
 import com.example.rhythmgame.Object.Monster.Rat
 import com.example.rhythmgame.Object.Monster.Skill
+import com.example.rhythmgame.Object.UI.BeatNote
 import com.example.rhythmgame.Object.UI.HPBar
 import com.example.rhythmgame.Object.UI.UIObject
 import com.example.rhythmgame.Object.UI.XButton
@@ -99,13 +100,15 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         ComponentManager.Register_Component("TextureCom_Rat_Run", Comp_Texture(context, R.drawable.rat_run))
         ComponentManager.Register_Component("TextureCom_Player_Idle", Comp_Texture(context, R.drawable.player_idle))
         ComponentManager.Register_Component("TextureCom_Player_Walk", Comp_Texture(context, R.drawable.player_walk))
-        ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field))
+        ComponentManager.Register_Component("TextureCom_Field", Comp_Texture(context, R.drawable.field2))
         ComponentManager.Register_Component("TextureCom_Joystick", Comp_Texture(context, R.drawable.joystickmain))
         ComponentManager.Register_Component("TextureCom_Joystick2", Comp_Texture(context, R.drawable.joystick2))
 
         ComponentManager.Register_Component("Texture_xButton", Comp_Texture(context, R.drawable.x_button))
         ComponentManager.Register_Component("Texture_yButton", Comp_Texture(context, R.drawable.y_button))
         ComponentManager.Register_Component("Texture_HP", Comp_Texture(context, R.drawable.hp_img))
+        ComponentManager.Register_Component("Texture_note", Comp_Texture(context, R.drawable.dot_note_sprite_sheet))
+
     }
 
     private fun Ready_UI() {
@@ -129,6 +132,10 @@ class MyGLRenderer(private val context: Context) : GLSurfaceView.Renderer {
         val hp = HPBar()
         ObjectManager.Add_Object(ObjectManager.LayerType.UI, hp)
         UIManager.SetHPBar(hp)
+
+        val beatnote = BeatNote()
+        ObjectManager.Add_Object(ObjectManager.LayerType.UI, beatnote)
+        UIManager.SetBeatNote(beatnote)
     }
 
     private fun Ready_Level() {

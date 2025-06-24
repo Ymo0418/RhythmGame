@@ -3,6 +3,7 @@ package com.example.rhythmgame.Manager
 import android.view.MotionEvent
 import com.example.rhythmgame.Base.Base
 import com.example.rhythmgame.Object.Joystick
+import com.example.rhythmgame.Object.UI.BeatNote
 import com.example.rhythmgame.Object.UI.HPBar
 import com.example.rhythmgame.Object.UI.UIObject
 import com.example.rhythmgame.Object.UI.XButton
@@ -15,6 +16,7 @@ object UIManager: Base() {
     var xbutton: XButton? = null
     var ybutton: YButton? = null
     var hpBar: HPBar? = null
+    var beatnote: BeatNote? = null
 
     // Game over 플래그
     var isGameOver = false
@@ -26,6 +28,9 @@ object UIManager: Base() {
     fun SetXButton(ui: XButton) { xbutton = ui }
     fun SetXButton(ui: YButton) { ybutton = ui }
     fun SetHPBar(ui: HPBar) { hpBar = ui }
+    fun SetBeatNote(ui: BeatNote) {
+        beatnote = ui
+    }
 
     //다른 오브젝트에서 특정 UI의 특정 값을 필요로 하면 이런식으로
     //새로 만들어서 값을 얻는 함수를 만들면 됨
@@ -43,10 +48,12 @@ object UIManager: Base() {
     }
 
     public fun CheckTouch() {
-        val Layer = ObjectManager.Get_Objects(ObjectManager.LayerType.UI)
-        for(event in eventQueue) {
-            for(ui in Layer) {
-                (ui as UIObject).OnTouch(event)
+        val layer = ObjectManager.Get_Objects(ObjectManager.LayerType.UI)
+        for (event in eventQueue) {
+            for (uiObj in layer) {
+                if (uiObj is UIObject) {
+                    uiObj.OnTouch(event)
+                }
             }
         }
         eventQueue.clear()
